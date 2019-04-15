@@ -2,7 +2,7 @@
 
 namespace DenisKisel\LaravelAdminReadySolution;
 
-use DenisKisel\LaravelAdminReadySolution\Commands\ReadySolutionCommand;
+use DenisKisel\LaravelAdminReadySolution\Commands\PageCommand;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelAdminReadySolutionServiceProvider extends ServiceProvider
@@ -76,7 +76,7 @@ class LaravelAdminReadySolutionServiceProvider extends ServiceProvider
 
         // Registering package commands.
          $this->commands([
-             ReadySolutionCommand::class
+             PageCommand::class
          ]);
     }
 }

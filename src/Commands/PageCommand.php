@@ -3,11 +3,10 @@
 
 namespace DenisKisel\LaravelAdminReadySolution\Commands;
 
-
-use function GuzzleHttp\Psr7\str;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
-class ReadySolutionCommand extends Command
+class PageCommand extends Command
 {
     protected $rootDir = __DIR__ . '/../../../../../';
 
@@ -17,11 +16,10 @@ class ReadySolutionCommand extends Command
     /**
      * The name and signature of the console command.
      * larasol - laravel-admin solution ;)
-     * {pattern} - page
      *
      * @var string
      */
-    protected $signature = 'larasol {pattern} {--model=}';
+    protected $signature = 'larasol:page {model}';
 
     /**
      * The console command description.
@@ -47,11 +45,6 @@ class ReadySolutionCommand extends Command
      */
     public function handle()
     {
-        if (!$this->isPatternExists()) {
-            $this->warn("Pattern: {$this->argument('pattern')} is not exists!");
-            die();
-        }
-
         $this->makeModel();
         $this->updateMigration();
         $this->createAdminController();
@@ -60,17 +53,13 @@ class ReadySolutionCommand extends Command
 
     protected function model()
     {
-        $model = $this->argument('pattern');
-        if (!empty($this->option('model'))) {
-            $model = $this->option('model');
-        }
-        return ucfirst($model);
+        return Str::studly($this->argument('model'));
     }
 
     protected function key()
     {
         $model =  $this->model();
-        return strtolower($model);
+        return Str::snake($model);
     }
 
     protected function makeModel()
@@ -89,7 +78,9 @@ class ReadySolutionCommand extends Command
         $latestFile = key($files);
 
         $content = file_get_contents($latestFile);
-        $content = str_replace('$table->timestamps();', file_get_contents(__DIR__ . "/../../resources/migration_stubs/{$this->argument('pattern')}.stub"), $content);
+
+        $migrationStub = __DIR__ . "/../../resources/page/migration.stub";
+        $content = str_replace('$table->timestamps();', file_get_contents($migrationStub), $content);
 
         file_put_contents($latestFile, $content);
         $this->info('Migration is updated!');
@@ -98,7 +89,7 @@ class ReadySolutionCommand extends Command
 
     protected function createAdminController()
     {
-        $controllerStubPath = __DIR__ . "/../../resources/controller_stubs/{$this->argument('pattern')}.stub";
+        $controllerStubPath = __DIR__ . "/../../resources/page/controller.stub";
         $newControllerPath = $this->rootDir . "app/Admin/Controllers/{$this->model()}Controller.php";
         copy($controllerStubPath, $newControllerPath);
 
@@ -114,7 +105,7 @@ class ReadySolutionCommand extends Command
     {
         $routesPath = $this->rootDir . '/app/Admin/routes.php';
 
-        $newRoute = "\$router->resource('{$this->plural()}', '{$this->model()}Controller');";
+        $newRoute = "\$router->resource('{$this->slug()}', '{$this->model()}Controller');";
 
         $src = '], function (Router $router) {';
         $replace = <<<EOF
@@ -132,17 +123,8 @@ EOF;
         }
     }
 
-    protected function plural()
+    protected function slug()
     {
-        if ($this->key()[-1] == 'y') {
-            return substr($this->key(), 0, -1) . 'ies';
-        }
-
-        return $this->key() . 's';
-    }
-
-    protected function isPatternExists()
-    {
-        return in_array($this->argument('pattern'), $this->patterns);
+        return Str::slug(Str::plural($this->key()));
     }
 }
