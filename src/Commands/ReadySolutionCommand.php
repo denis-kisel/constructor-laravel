@@ -93,6 +93,7 @@ class ReadySolutionCommand extends Command
 
         file_put_contents($latestFile, $content);
         $this->info('Migration is updated!');
+        $this->call('migrate');
     }
 
     protected function createAdminController()
