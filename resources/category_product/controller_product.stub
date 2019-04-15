@@ -158,7 +158,7 @@ class {model}Controller extends Controller
             $form->number('sort')->default(0);
             $form->switch('is_active', __('admin.is_active'))->default(1);
         })->tab(__('admin.images'), function (Form $form) {
-            $form->image('image', __('admin.general_image')->removable();
+            $form->image('image', __('admin.general_image'))->removable();
             $form->divider();
             $form->hasMany('images', function (Form\NestedForm $form) {
                 $form->image('image', __('admin.image'));
