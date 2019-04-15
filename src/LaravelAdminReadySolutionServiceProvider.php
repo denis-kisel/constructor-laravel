@@ -2,6 +2,7 @@
 
 namespace DenisKisel\LaravelAdminReadySolution;
 
+use DenisKisel\LaravelAdminReadySolution\Commands\CategoryProductCommand;
 use DenisKisel\LaravelAdminReadySolution\Commands\PageCommand;
 use Illuminate\Support\ServiceProvider;
 
@@ -76,7 +77,8 @@ class LaravelAdminReadySolutionServiceProvider extends ServiceProvider
 
         // Registering package commands.
          $this->commands([
-             PageCommand::class
+             PageCommand::class,
+             CategoryProductCommand::class,
          ]);
     }
 }

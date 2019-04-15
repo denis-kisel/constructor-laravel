@@ -1,0 +1,75 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class {class} extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('{categories_table}', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name');
+            $table->string('image')->nullable();
+            $table->text('short_description')->nullable();
+            $table->text('description')->nullable();
+            $table->string('title')->nullable();
+            $table->string('slug')->nullable();
+            $table->string('h1')->nullable();
+            $table->text('keywords')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->integer('sort')->default(0);
+            $table->boolean('is_active')->default(1);
+            $table->timestamps();
+        });
+
+        Schema::create('{products_table}', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name');
+            $table->string('price')->nullable();
+            $table->string('image')->nullable();
+            $table->text('description')->nullable();
+            $table->string('title')->nullable();
+            $table->string('slug')->nullable();
+            $table->string('h1')->nullable();
+            $table->text('keywords')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->integer('sort')->default(0);
+            $table->boolean('is_active')->default(1);
+            $table->timestamps();
+        });
+
+        Schema::create('{product_images_table}', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->integer('product_id');
+            $table->string('image');
+            $table->integer('sort')->default(0);
+            $table->timestamps();
+        });
+
+        Schema::create('{category_product_table}', function (Blueprint $table) {
+            $table->integer('category_id');
+            $table->integer('product_id');
+            $table->primary(['category_id', 'product_id']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('{product_images_table}');
+        Schema::dropIfExists('{category_product_table}');
+        Schema::dropIfExists('{categories_table}');
+        Schema::dropIfExists('{products_table}');
+    }
+}

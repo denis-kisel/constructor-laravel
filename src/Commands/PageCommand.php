@@ -8,11 +8,6 @@ use Illuminate\Support\Str;
 
 class PageCommand extends Command
 {
-    protected $rootDir = __DIR__ . '/../../../../../';
-
-    protected $patterns = [
-        'page'
-    ];
     /**
      * The name and signature of the console command.
      * larasol - laravel-admin solution ;)
@@ -72,7 +67,7 @@ class PageCommand extends Command
 
     protected function updateMigration()
     {
-        $files = array_merge(glob($this->rootDir . 'database/migrations/*.php'), glob("*.php"));
+        $files = array_merge(glob(base_path('database/migrations/*.php')), glob("*.php"));
         $files = array_combine($files, array_map("filemtime", $files));
         arsort($files);
         $latestFile = key($files);
@@ -90,7 +85,7 @@ class PageCommand extends Command
     protected function createAdminController()
     {
         $controllerStubPath = __DIR__ . "/../../resources/page/controller.stub";
-        $newControllerPath = $this->rootDir . "app/Admin/Controllers/{$this->model()}Controller.php";
+        $newControllerPath = app_path("Admin/Controllers/{$this->model()}Controller.php");
         copy($controllerStubPath, $newControllerPath);
 
         $content = file_get_contents($newControllerPath);
@@ -103,7 +98,7 @@ class PageCommand extends Command
 
     protected function addRoute()
     {
-        $routesPath = $this->rootDir . '/app/Admin/routes.php';
+        $routesPath = app_path('Admin/routes.php');
 
         $newRoute = "\$router->resource('{$this->slug()}', '{$this->model()}Controller');";
 

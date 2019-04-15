@@ -1,0 +1,178 @@
+<?php
+
+namespace App\Admin\Controllers;
+
+use App\Models\{category_model};
+use DenisKisel\ActiveHelper\ActiveHelper;
+use App\Models\{model};
+use App\Http\Controllers\Controller;
+use DenisKisel\SmartImage\SmartImage;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+
+class {model}Controller extends Controller
+{
+    use HasResourceActions;
+
+    /**
+     * Index interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function index(Content $content)
+    {
+        return $content
+            ->header('{title}')
+            ->description(' ')
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->header('Detail')
+            ->description(' ')
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->header(__('admin.edit'))
+            ->description(' ')
+            ->body($this->form()->edit($id));
+    }
+
+    /**
+     * Create interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function create(Content $content)
+    {
+        return $content
+            ->header(__('admin.create'))
+            ->description('description')
+            ->body($this->form());
+    }
+
+    /**
+     * Make a grid builder.
+     *
+     * @return Grid
+     */
+    protected function grid()
+    {
+        $grid = new Grid(new {model});
+
+        $grid->model()->orderBy('created_at', 'desc');
+
+        $grid->id(__('admin.id'));
+        $grid->image(__('admin.image'))->display(function ($image) {
+            $src = ($image) ? SmartImage::cache($image, 100, 100) : '';
+            return ($src) ? "<img src='{$src}'>" : '';
+        });
+        $grid->name(__('admin.name'))->editable('text');
+        $grid->price(__('admin.price'))->editable('text');
+        $grid->categories(__('admin.categories'))->display(function ($categories) {
+            $collection = collect($categories);
+            return "<label class='label label-warning'>{$collection->implode('name', ', ')}</label>";
+        });
+        $grid->title(__('admin.title'))->editable('text');
+        $grid->slug(__('admin.slug'))->editable('text');
+        $grid->h1(__('admin.h1'))->editable('text');
+        $grid->keywords(__('admin.keywords'))->editable('textarea');
+        $grid->meta_description(__('admin.meta_description'))->editable('textarea');
+        $grid->sort(__('admin.sort'))->editable('text');
+        $grid->is_active(__('admin.is_active'))->editable('select', ActiveHelper::editable());
+        $grid->created_at(__('admin.created_at'));
+        $grid->updated_at(__('admin.updated_at'));
+
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+        });
+
+        return $grid;
+    }
+
+    /**
+     * Make a show builder.
+     *
+     * @param mixed $id
+     * @return Show
+     */
+    protected function detail($id)
+    {
+        $show = new Show({model}::findOrFail($id));
+
+        $show->id(__('admin.id'));
+        $show->code(__('admin.code'));
+        $show->name(__('admin.name'));
+        $show->description(__('admin.description'));
+        $show->title(__('admin.title'));
+        $show->slug(__('admin.slug'));
+        $show->h1(__('admin.h1'));
+        $show->keywords(__('admin.keywords'));
+        $show->meta_description(__('admin.meta_description'));
+        $show->is_active(__('admin.is_active'));
+        $show->created_at(__('admin.created_at'));
+        $show->updated_at(__('admin.updated_at'));
+
+        return $show;
+    }
+
+    /**
+     * Make a form builder.
+     *
+     * @return Form
+     */
+    protected function form()
+    {
+        $form = new Form(new {model});
+
+        $form->tab(__('admin.general'), function (Form $form) {
+            $form->multipleSelect('categories', __('admin.categories'))->options({category_model}::all()->pluck('name',
+            'id'));
+            $form->text('name', __('admin.name'))->required();
+            $form->text('price', __('admin.price'));
+            $form->summernote('description', __('admin.description'));
+            $form->number('sort')->default(0);
+            $form->switch('is_active', __('admin.is_active'))->default(1);
+        })->tab(__('admin.images'), function (Form $form) {
+            $form->image('image', __('admin.general_image')->removable();
+            $form->divider();
+            $form->hasMany('images', function (Form\NestedForm $form) {
+                $form->image('image', __('admin.image'));
+                $form->number('sort', __('admin.sort'))->default(0);
+            });
+        })->tab(__('admin.seo'), function (Form $form) {
+            $form->text('title', __('admin.title'));
+            $form->text('slug', __('admin.slug'))->required();
+            $form->text('h1', __('admin.h1'))->attribute(['style' => 'margin:0']);
+            $form->textarea('keywords', __('admin.keywords'));
+            $form->textarea('meta_description', __('admin.meta_description'));
+        });
+
+
+        return $form;
+    }
+}

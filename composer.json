@@ -12,7 +12,8 @@
     "keywords": ["Laravel", "LaravelAdminReadySolution"],
     "require": {
         "illuminate/support": "~5",
-        "denis-kisel/active-helper" : "*"
+        "denis-kisel/active-helper" : "*",
+        "denis-kisel/smart-image" : ""
     },
     "autoload": {
         "psr-4": {

@@ -12,13 +12,16 @@ $ composer require denis-kisel/laravel-admin-ready-solution
 
 ## Usage
 
-Create new model with admin controller:
+Create new page model with admin controller:
 ``` bash
-# Command: larasol {pattern} {--model}
-# Where {pattern} - page
-# And {--model} - is optional (by default - Page)
-$ php artisan larasol page 
+# Command: larasol:page {model}
+$ php artisan larasol:page Page
 
-#For example create new Post model
-$ php artisan larasol page --model=Post
+```
+
+Create new product with categories(many to many) models with admin controllers:
+``` bash
+# Command: larasol:category-product {category_model} {product_model}
+$ php artisan larasol:category-product Category Product
+
 ```
