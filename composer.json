@@ -13,7 +13,7 @@
     "require": {
         "illuminate/support": "~5",
         "denis-kisel/active-helper" : "*",
-        "denis-kisel/smart-image" : ""
+        "denis-kisel/smart-image" : "*"
     },
     "autoload": {
         "psr-4": {
