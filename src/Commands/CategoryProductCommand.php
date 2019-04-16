@@ -113,9 +113,11 @@ class CategoryProductCommand extends Command
         $content = str_replace('{products_table}', Str::plural(Str::snake($this->productModel())), $content);
         $content = str_replace('{product_images_table}', Str::plural(Str::snake($this->productImageModel())), $content);
         $content = str_replace('{category_product_table}', Str::snake($this->categoryProductModel()), $content);
+        $content = str_replace('{product_id}', Str::snake($this->productModel()) . '_id', $content);
+        $content = str_replace('{category_id}', Str::snake($this->categoryModel()) . '_id', $content);
 
         file_put_contents($migrationPath, $content);
-        $this->info('Migration is updated!');
+        $this->info('Migration is created!');
         $this->call('migrate');
     }
 
