@@ -1,7 +1,7 @@
 <?php
 
 
-namespace DenisKisel\Contructor\Traits;
+namespace DenisKisel\Constructor\Traits;
 
 
 use Illuminate\Support\Arr;

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace DenisKisel\Contructor\Exceptions;
+namespace DenisKisel\Constructor\Exceptions;
 
 
 class ImageException extends \Exception

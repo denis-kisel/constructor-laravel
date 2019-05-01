@@ -1,5 +1,5 @@
 {
-    "name": "denis-kisel/laravel-admin-ready-solution",
+    "name": "denis-kisel/constructor-laravel",
     "description": ":Ready solution for generate models with laravel-admin controllers",
     "authors": [
         {
@@ -8,8 +8,8 @@
             "homepage": "http://digital-elephant.com.ua"
         }
     ],
-    "homepage": "https://github.com/denis-kisel/laravel-admin-ready-solution",
-    "keywords": ["Laravel", "LaravelAdminReadySolution"],
+    "homepage": "https://github.com/denis-kisel/constructor-laravel",
+    "keywords": ["Laravel", "Constructor"],
     "require": {
         "illuminate/support": "~5",
         "denis-kisel/active-helper" : "^1.0",
@@ -17,21 +17,16 @@
     },
     "autoload": {
         "psr-4": {
-            "DenisKisel\\LaravelAdminReadySolution\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "DenisKisel\\LaravelAdminReadySolution\\Tests\\": "tests"
+            "DenisKisel\\Constructor\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "DenisKisel\\LaravelAdminReadySolution\\LaravelAdminReadySolutionServiceProvider"
+                "DenisKisel\\Constructor\\ConstructorServiceProvider"
             ],
             "aliases": {
-                "LaravelAdminReadySolution": "DenisKisel\\LaravelAdminReadySolution\\Facades\\LaravelAdminReadySolution"
+                "LaravelAdminReadySolution": "DenisKisel\\Constructor\\Facades\\Constructor"
             }
         }
     }

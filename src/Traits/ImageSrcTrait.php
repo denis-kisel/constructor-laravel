@@ -3,7 +3,7 @@
 
 namespace DenisKisel\Constructor\Traits;
 
-use DenisKisel\Contructor\Exceptions\ImageException;
+use DenisKisel\Constructor\Exceptions\ImageException;
 use DenisKisel\SmartImage\SmartImage;
 
 trait ImageSrcTrait

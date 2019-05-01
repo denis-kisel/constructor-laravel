@@ -1,6 +1,6 @@
 <?php
 
-namespace DenisKisel\LaravelAdminReadySolution;
+namespace DenisKisel\Constructor;
 
 class Constructor
 {
