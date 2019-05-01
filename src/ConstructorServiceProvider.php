@@ -75,6 +75,10 @@ class ConstructorServiceProvider extends ServiceProvider
             __DIR__.'/../resources/lang' => resource_path('lang/vendor/deniskisel'),
         ], 'constructor.views');*/
 
+        $this->publishes([
+            __DIR__ . '/../resources/example/' => __DIR__ . '/../../../../app/Admin/Controllers/Widgets/',
+        ]);
+
         // Publishing the configuration file.
         $this->publishes([
             __DIR__.'/../config/image.php' => config_path('image.php'),

@@ -1,0 +1,4 @@
+$table->integer('{category}');
+            $table->integer('path_id');
+            $table->integer('level');
+            $table->timestamps();

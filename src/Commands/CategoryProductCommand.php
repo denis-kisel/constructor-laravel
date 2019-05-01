@@ -10,11 +10,10 @@ class CategoryProductCommand extends Command
 {
     /**
      * The name and signature of the console command.
-     * larasol - laravel-admin solution ;)
      *
      * @var string
      */
-    protected $signature = 'larasol:category-product {category_model} {product_model}';
+    protected $signature = 'construct:category-product {category_model} {product_model}';
 
     /**
      * The console command description.

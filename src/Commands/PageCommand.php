@@ -10,11 +10,10 @@ class PageCommand extends Command
 {
     /**
      * The name and signature of the console command.
-     * larasol - laravel-admin solution ;)
      *
      * @var string
      */
-    protected $signature = 'larasol:page {model}';
+    protected $signature = 'construct:page {model}';
 
     /**
      * The console command description.
