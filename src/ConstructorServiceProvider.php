@@ -1,12 +1,12 @@
 <?php
 
-namespace DenisKisel\LaravelAdminReadySolution;
+namespace DenisKisel\Constructor;
 
-use DenisKisel\LaravelAdminReadySolution\Commands\CategoryProductCommand;
-use DenisKisel\LaravelAdminReadySolution\Commands\PageCommand;
+use DenisKisel\Constructor\Commands\CategoryProductCommand;
+use DenisKisel\Constructor\Commands\PageCommand;
 use Illuminate\Support\ServiceProvider;
 
-class LaravelAdminReadySolutionServiceProvider extends ServiceProvider
+class ConstructorServiceProvider extends ServiceProvider
 {
     /**
      * Perform post-registration booting of services.
@@ -33,11 +33,11 @@ class LaravelAdminReadySolutionServiceProvider extends ServiceProvider
      */
     public function register()
     {
-//        $this->mergeConfigFrom(__DIR__.'/../config/laraveladminreadysolution.php', 'laraveladminreadysolution');
+//        $this->mergeConfigFrom(__DIR__.'/../config/constructor.php', 'constructor');
 
         // Register the service the package provides.
-        $this->app->singleton('laraveladminreadysolution', function ($app) {
-            return new LaravelAdminReadySolution;
+        $this->app->singleton('constructor', function ($app) {
+            return new Constructor;
         });
     }
 
@@ -48,7 +48,7 @@ class LaravelAdminReadySolutionServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['laraveladminreadysolution'];
+        return ['constructor'];
     }
     
     /**
@@ -63,17 +63,22 @@ class LaravelAdminReadySolutionServiceProvider extends ServiceProvider
         // Publishing the views.
         /*$this->publishes([
             __DIR__.'/../resources/views' => base_path('resources/views/vendor/deniskisel'),
-        ], 'laraveladminreadysolution.views');*/
+        ], 'constructor.views');*/
 
         // Publishing assets.
         /*$this->publishes([
             __DIR__.'/../resources/assets' => public_path('vendor/deniskisel'),
-        ], 'laraveladminreadysolution.views');*/
+        ], 'constructor.views');*/
 
         // Publishing the translation files.
         /*$this->publishes([
             __DIR__.'/../resources/lang' => resource_path('lang/vendor/deniskisel'),
-        ], 'laraveladminreadysolution.views');*/
+        ], 'constructor.views');*/
+
+        // Publishing the configuration file.
+        $this->publishes([
+            __DIR__.'/../config/image.php' => config_path('image.php'),
+        ], 'image.config');
 
         // Registering package commands.
          $this->commands([

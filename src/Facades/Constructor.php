@@ -4,7 +4,7 @@ namespace DenisKisel\LaravelAdminReadySolution\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class LaravelAdminReadySolution extends Facade
+class Constructor extends Facade
 {
     /**
      * Get the registered name of the component.
@@ -13,6 +13,6 @@ class LaravelAdminReadySolution extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'laraveladminreadysolution';
+        return 'constructor';
     }
 }

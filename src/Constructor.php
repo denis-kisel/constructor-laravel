@@ -2,7 +2,7 @@
 
 namespace DenisKisel\LaravelAdminReadySolution;
 
-class LaravelAdminReadySolution
+class Constructor
 {
     // Build wonderful things
 }
