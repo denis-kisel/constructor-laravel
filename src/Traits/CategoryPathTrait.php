@@ -9,23 +9,29 @@ use Illuminate\Support\Str;
 
 trait CategoryPathTrait
 {
-    public function updatePaths()
+    public static function updatePaths()
     {
-        $categories = get_class($this)::all();
+        $categoryClass = __CLASS__;
+        $pathClass = __CLASS__ . 'Path';
+        $pathClass::truncate();
+        $categories = $categoryClass::all();
 
         if ($categories->count() > 0) {
             foreach ($categories as $category) {
-                $this->makeAndInsertPath($category->id);
+                $category->insertPath();
             }
         }
     }
 
     public function updatePath()
     {
-        $ids = $this->deletePath();
-        if ($ids) {
-            foreach ($ids as $id) {
-                $this->makeAndInsertPath($id);
+        $pathClass = get_class($this) . 'Path';
+        $category_field = Str::snake((new \ReflectionClass($this))->getShortName()) . '_id';
+        $categories = $pathClass::select($category_field . ' as id')->wherePathId($this->id)->distinct()->get();
+        $pathClass::whereIn($category_field, $categories->pluck('id', 'id')->toArray())->delete();
+        if ($categories->count() > 0) {
+            foreach ($categories as $category) {
+                $this->makeAndInsertPath($category->id);
             }
         }
     }
@@ -35,18 +41,11 @@ trait CategoryPathTrait
         $this->makeAndInsertPath($this->id);
     }
 
-    public function deletePath()
-    {
-        $pathClass = get_class($this) . 'Path';
-        $category_field = Str::snake(get_class($this)) . '_id';
-        $categories = $pathClass::select($category_field . ' as id')->wherePathId($this->id)->distinct()->get();
-        $pathClass::whereIn($category_field, $categories->pluck('id', 'id')->toArray())->delete();
-        return $categories->pluck('id', 'id')->toArray();
-    }
-
     public function makeAndInsertPath($id, $categories = [])
     {
-        $category = get_class($this)::find($id);
+        $categoryClass = get_class($this);
+        $categoryShortClass = (new \ReflectionClass($this))->getShortName();
+        $category = $categoryClass::find($id);
         $categories[] = $category->id;
         if ($category->hasParent()) {
             return $this->makeAndInsertPath($category->parent_id, $categories);
@@ -54,7 +53,7 @@ trait CategoryPathTrait
             $categories = array_reverse($categories);
             $mainCategoryId = Arr::last($categories);
 
-            $category_field = Str::snake(get_class($this)) . '_id';
+            $category_field = Str::snake($categoryShortClass) . '_id';
 
             $values = [];
             foreach ($categories as $key => $category) {
