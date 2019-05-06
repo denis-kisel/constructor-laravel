@@ -13,7 +13,8 @@
     "require": {
         "illuminate/support": "~5",
         "denis-kisel/active-helper" : "^1.0",
-        "denis-kisel/smart-image" : "^1.1"
+        "denis-kisel/smart-image" : "^1.1",
+        "dimsav/laravel-translatable": "8.*"
     },
     "autoload": {
         "psr-4": {

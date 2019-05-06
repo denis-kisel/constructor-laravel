@@ -3,6 +3,7 @@
 namespace DenisKisel\Constructor;
 
 use DenisKisel\Constructor\Commands\CategoryProductCommand;
+use DenisKisel\Constructor\Commands\CustomTranslationCommand;
 use DenisKisel\Constructor\Commands\PageCommand;
 use Illuminate\Support\ServiceProvider;
 
@@ -88,6 +89,7 @@ class ConstructorServiceProvider extends ServiceProvider
          $this->commands([
              PageCommand::class,
              CategoryProductCommand::class,
+             CustomTranslationCommand::class,
          ]);
     }
 }
