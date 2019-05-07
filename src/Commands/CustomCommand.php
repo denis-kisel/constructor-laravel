@@ -8,7 +8,7 @@ use DenisKisel\Helper\AStr;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
-class CustomTranslationCommand extends Command
+class CustomCommand extends Command
 {
     const PHP_TAB = "\t";
 
@@ -91,14 +91,14 @@ class CustomTranslationCommand extends Command
 
     /**
      * The name and signature of the console command.
-     * fields: field_name:data_type:length{migrationMethods:values}[t][m]
+     * fields: field_name:{type}:{length}[null]
      * {type} - string|integer|text
      *
      * ct - custom translation
      *
      * @var string
      */
-    protected $signature = 'construct:customt {model} {fields} {--o} {--a}';
+    protected $signature = 'construct:custom {model} {fields} {--o}';
 
     /**
      * The console command description.
@@ -127,11 +127,8 @@ class CustomTranslationCommand extends Command
         $this->stopIfModelExists();
         $this->makeModel();
         $this->makeMigration();
-
-        if ($this->option('a')) {
-            $this->createAdminControllers();
-            $this->addRoute();
-        }
+        $this->createAdminControllers();
+        $this->addRoute();
     }
 
     protected function makeModel()
@@ -142,34 +139,18 @@ class CustomTranslationCommand extends Command
         $this->call("make:model", [
             'name' => $this->argument('model'),
         ]);
-
-        $this->call("make:model", [
-            'name' => $this->translationModel(),
-        ]);
     }
 
-   protected function translationModel()
-   {
-       return $this->argument('model') . 'Translation';
-   }
-
-   protected function shortTranslationModel()
-   {
-       $reflection = new \ReflectionClass($this->translationModel());
-       return $reflection->getShortName();
-   }
+    protected function shortModelClassName()
+    {
+        $reflection = new \ReflectionClass($this->argument('model'));
+        return $reflection->getShortName();
+    }
 
     protected function fields()
     {
         $fields = [];
         foreach (explode(',', $this->argument('fields')) as $item) {
-
-            $isTranslation = false;
-            if (Str::contains($item, '[t]')) {
-                $isTranslation = true;
-                $item = str_replace('[t]', '', $item);
-            }
-
             $migrationMethods = [];
             if (AStr::is('{*}', $item)) {
                 $methods = explode('+', AStr::getContent('{*}', $item));
@@ -194,84 +175,46 @@ class CustomTranslationCommand extends Command
                 'name' => $parts[0],
                 'type' => $parts[1],
                 'length' => (!empty($parts[2])) ? $parts[2] : null,
-                'migration_methods' => $migrationMethods,
-                'is_translation' => $isTranslation
+                'migration_methods' => $migrationMethods
             ];
         }
 
-        return collect($fields);
-    }
-
-    protected function models()
-    {
-        return [
-            [
-                'class' => $this->argument('model'),
-                'short_class' => $this->shortModelClassName(),
-                'template' => 'model'
-            ],
-            [
-                'class' => $this->translationModel(),
-                'short_class' => $this->shortTranslationModel(),
-                'template' => 'translation'
-            ]
-        ];
+        return $fields;
     }
 
     protected function makeMigration()
     {
-        foreach ($this->models() as $model) {
-            $table = Str::plural(Str::snake($model['short_class']));
-            $migrationPath = database_path('migrations/' . date('Y_m_d_His') . "_create_{$table}_table.php");
-            $stub = __DIR__ . '/../../resources/custom_translation/migration.stub';
+        $table = Str::plural(Str::snake($this->shortModelClassName()));
+        $migrationPath = database_path('migrations/' . date('Y_m_d_His') . "_create_{$table}_table.php");
+        $stub = __DIR__ . '/../../resources/custom/migration.stub';
 
-            copy($stub, $migrationPath);
+        copy($stub, $migrationPath);
 
-            $content = file_get_contents($migrationPath);
-            $class = Str::studly($table);
-            $content = str_replace('{class}', "Create{$class}Table", $content);
-            $content = str_replace('{table}', $table, $content);
-            $content = str_replace('{fields}', $this->makeMigrationFields(($model['template'] == 'translation')),
-                $content);
-            file_put_contents($migrationPath, $content);
-            $this->info('Migration is created!');
-        }
+        $content = file_get_contents($migrationPath);
+        $class = Str::studly($table);
+        $content = str_replace('{class}', "Create{$class}Table", $content);
+        $content = str_replace('{table}', $table, $content);
+        $content = str_replace('{fields}', $this->makeMigrationFields(), $content);
+        file_put_contents($migrationPath, $content);
+        $this->info('Migration is created!');
 //        $this->call('migrate');
     }
 
-    protected function makeMigrationFields($isTranslation)
+    protected function makeMigrationFields()
     {
         $output = '$table->increments(\'id\');' . PHP_EOL;
-
-        if ($isTranslation) {
-            $model_id = Str::snake($this->shortModelClassName()) . '_id';
-            $output .= $this->formatText("\$table->integer('{$model_id}');");
-        }
-
-        foreach ($this->fields()->where('is_translation', '=', $isTranslation)->toArray() as $field) {
-            if (!is_null($field['length'])) {
-                $output .= $this->formatText("\$table->{$field['type']}('{$field['name']}', {$field['length']}){$this->makeMigrationMethods($field['migration_methods'])};");
+        foreach ($this->fields() as $field) {
+            if (!is_null($field['length']) && !$field['is_nullable']) {
+                $output .= $this->formatText("\$table->{$field['type']}('{$field['name']}', {$field['length']});");
+            } else if (!is_null($field['length']) && $field['is_nullable']) {
+                $output .= $this->formatText("\$table->{$field['type']}('{$field['name']}', {$field['length']})->nullable();");
+            } else if (is_null($field['length']) && $field['is_nullable']) {
+                $output .= $this->formatText("\$table->{$field['type']}('{$field['name']}')->nullable();");
             } else {
-                $output .= $this->formatText("\$table->{$field['type']}('{$field['name']}'){$this->makeMigrationMethods($field['migration_methods'])};");
+                $output .= $this->formatText("\$table->{$field['type']}('{$field['name']}');");
             }
         }
         $output .= $this->formatText('$table->timestamps();');
-
-        return $output;
-    }
-
-    protected function makeMigrationMethods($methods)
-    {
-        $output = '';
-        if ($methods) {
-            foreach ($methods as $method) {
-                if (!is_null($method['value'])) {
-                    $output .= "->{$method['name']}('{$method['value']}')";
-                } else {
-                    $output .= "->{$method['name']}()";
-                }
-            }
-        }
 
         return $output;
     }
@@ -312,7 +255,7 @@ EOF;
     protected function createAdminControllers()
     {
 
-        $controllerStubPath = __DIR__ . "/../../resources/custom_translation/controller.stub";
+        $controllerStubPath = __DIR__ . "/../../resources/custom/controller.stub";
         $newControllerPath = app_path("Admin/Controllers/{$this->shortModelClassName()}Controller.php");
         copy($controllerStubPath, $newControllerPath);
 
@@ -369,11 +312,5 @@ EOF;
     protected function formatText($text, $countTabs = 3)
     {
         return str_repeat(self::PHP_TAB, $countTabs) . $text . PHP_EOL;
-    }
-
-    protected function shortModelClassName()
-    {
-        $reflection = new \ReflectionClass($this->argument('model'));
-        return $reflection->getShortName();
     }
 }
