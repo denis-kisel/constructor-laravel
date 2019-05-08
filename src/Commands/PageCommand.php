@@ -100,7 +100,10 @@ class PageCommand extends Command
     protected function makeAdminController()
     {
         if ($this->option('a')) {
-            $this->call('construct:admin_page');
+            $this->call('construct:admin_page', [
+                'model' => $this->className(),
+                '--fields' => $this->option('fields')
+            ]);
         }
     }
 }

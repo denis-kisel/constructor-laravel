@@ -3,7 +3,7 @@
 namespace App\Admin\Controllers;
 
 use DenisKisel\ActiveHelper\ActiveHelper;
-use App\Models\{model};
+use {modelClass};
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
@@ -11,7 +11,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 
-class {model}Controller extends Controller
+class {controllerClass} extends Controller
 {
     use HasResourceActions;
 
@@ -24,7 +24,7 @@ class {model}Controller extends Controller
     public function index(Content $content)
     {
         return $content
-            ->header(__('admin.{key}'))
+            ->header('{title}')
             ->description(' ')
             ->body($this->grid());
     }
@@ -69,7 +69,7 @@ class {model}Controller extends Controller
     {
         return $content
             ->header(__('admin.create'))
-            ->description('description')
+            ->description(' ')
             ->body($this->form());
     }
 
@@ -80,7 +80,7 @@ class {model}Controller extends Controller
      */
     protected function grid()
     {
-        $grid = new Grid(new {model});
+        $grid = new Grid(new {basenameModelClass});
 
         $grid->model()->orderBy('created_at', 'desc');
 
@@ -94,6 +94,7 @@ class {model}Controller extends Controller
         $grid->h1(__('admin.h1'))->editable('text');
         $grid->keywords(__('admin.keywords'))->editable('textarea');
         $grid->meta_description(__('admin.meta_description'))->editable('textarea');
+{grid}
         $grid->is_active(__('admin.is_active'))->editable('select', ActiveHelper::editable());
         $grid->created_at(__('admin.created_at'));
         $grid->updated_at(__('admin.updated_at'));
@@ -113,7 +114,7 @@ class {model}Controller extends Controller
      */
     protected function detail($id)
     {
-        $show = new Show({model}::findOrFail($id));
+        $show = new Show({basenameModelClass}::findOrFail($id));
 
         $show->id(__('admin.id'));
         $show->code(__('admin.code'));
@@ -138,7 +139,7 @@ class {model}Controller extends Controller
      */
     protected function form()
     {
-        $form = new Form(new {model});
+        $form = new Form(new {basenameModelClass});
 
         $form->text('code', __('admin.code'));
         $form->text('name', __('admin.name'))->required();
@@ -148,6 +149,7 @@ class {model}Controller extends Controller
         $form->text('h1', __('admin.h1'))->attribute(['style' => 'margin:0']);
         $form->textarea('keywords', __('admin.keywords'));
         $form->textarea('meta_description', __('admin.meta_description'));
+{form}
         $form->switch('is_active', __('admin.is_active'))->default(1);
 
         return $form;

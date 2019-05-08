@@ -3,6 +3,7 @@
 namespace DenisKisel\Constructor;
 
 use DenisKisel\Constructor\Commands\AdminCommand;
+use DenisKisel\Constructor\Commands\AdminPageCommand;
 use DenisKisel\Constructor\Commands\AdminTranslationCommand;
 use DenisKisel\Constructor\Commands\CategoryProductCommand;
 use DenisKisel\Constructor\Commands\CustomCommand;
@@ -95,6 +96,7 @@ class ConstructorServiceProvider extends ServiceProvider
         // Registering package commands.
          $this->commands([
              PageCommand::class,
+             AdminPageCommand::class,
              CategoryProductCommand::class,
              ModelCommand::class,
              ModelTranslationCommand::class,
