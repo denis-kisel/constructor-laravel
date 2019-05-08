@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use DenisKisel\ActiveHelper\ActiveHelper;
 use {modelClass};
+use {model}
 use App\Http\Controllers\Controller;
 use DenisKisel\SmartImage\SmartImage;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -86,10 +87,8 @@ class {controllerClass} extends Controller
         $grid->model()->orderBy('created_at', 'desc');
 
         $grid->id(__('admin.id'));
-        $grid->transes(__('admin.locales'))->display(function ($transes) {
-            $tr = collect($transes);
-            return '<label class="label label-warning">' . $tr->implode('locale', ', ') . '</label>';
-        });
+        $grid->{model_id}('{model_title}')->editable('select', {basename_model}::all()->pluck('name', 'id'));
+        $grid->locale(__('admin.locale'))->editable('select', Locale::all()->pluck('code', 'code'));
 {grid}
         $grid->created_at(__('admin.created_at'));
         $grid->updated_at(__('admin.updated_at'));
@@ -121,15 +120,9 @@ class {controllerClass} extends Controller
     protected function form()
     {
         $form = new Form(new {basenameModelClass});
-
-        $form->tab(__('admin.general'), function (Form $form) {
+        $form->select('{model_id}', '{model_title}')->options({basename_model}::all()->pluck('name', 'id'));
+        $form->select('locale', __('admin.locale'))->options(Locale::all()->pluck('code', 'code'));
 {form}
-        })->tab(__('admin.locales'), function(Form $form) {
-            $form->hasMany('transes', function (Form\NestedForm $form) {
-{translation_form}
-            });
-        });
-
         return $form;
     }
 }

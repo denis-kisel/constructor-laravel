@@ -16,12 +16,11 @@ class ModelTranslationCommand extends Command
      * fields: field_name:data_type:length{migration_methods}
      * {type} - string|integer|text
      *
-     * Example: construct:modelt App\\Models\\Page name:string,description:text{nullable},
-     * is_active:boolean{nullable+default:1}
+     * Example: construct:modelt App\\Models\\Page name:string[t],description:text{nullable}[t],is_active:boolean{nullable+default:1}
      *
      * @var string
      */
-    protected $signature = 'construct:modelt {model} {fields} {--i} {--m}';
+    protected $signature = 'construct:modelt {model} {fields} {--i} {--m} {--a}';
 
     /**
      * The console command description.
@@ -42,6 +41,7 @@ class ModelTranslationCommand extends Command
         $this->makeModel();
         $this->bindModels();
         $this->makeMigration();
+        $this->makeAdminControllers();
     }
 
     protected function makeModel()
@@ -136,6 +136,17 @@ class ModelTranslationCommand extends Command
     protected function makeMigrationFields($isTranslation, $modelClassName)
     {
         return MigrationService::generateMigrationFields($this->fields(), $isTranslation, $modelClassName);
+    }
+
+    protected function makeAdminControllers()
+    {
+        if ($this->option('a')) {
+            $this->call('construct:admint', [
+                'model' => $this->argument('model'),
+                'fields' => $this->argument('fields'),
+                '--i' => ($this->option('i')) ? '--i' : null
+            ]);
+        }
     }
 
     protected function stopIfModelExists()

@@ -14,7 +14,7 @@ class AdminTranslationCommand extends Command
      * fields: field_name:data_type:length{migration_methods}
      * {type} - string|integer|text
      *
-     * Example: construct:admint App\\Models\\Page name:string,description:text{nullable},is_active:boolean{nullable+default:1}
+     * Example: construct:admint App\\Models\\Page name:string[t],description:text{nullable}[t],image:string{nullable},is_active:boolean{nullable+default:1}
      *
      * @var string
      */
@@ -65,10 +65,12 @@ class AdminTranslationCommand extends Command
         return [
             [
                 'class' => $this->argument('model'),
+                'class_basename' => $this->baseNameModelClass(),
                 'template' => 'controller'
             ],
             [
                 'class' => $this->translationModelClass(),
+                'class_basename' => $this->translationBaseModelClass(),
                 'template' => 'controller_translation'
             ]
         ];
@@ -76,7 +78,7 @@ class AdminTranslationCommand extends Command
 
     protected function makeController()
     {
-        AdminService::makeControllerTranslation($this->models(), $this->fields());
+        AdminService::makeControllerTranslation(collect($this->models()), $this->fields());
         $this->info("Admin {$this->baseNameModelClass()}Controller is created!");
     }
 

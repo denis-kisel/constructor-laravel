@@ -13,15 +13,15 @@ class AdminService
 {
     public static $adminControllerStub = __DIR__ . '/../../resources/custom/admin_controller.stub';
 
-    public static function generateForm(Collection $fields, $isTranslation = false)
+    public static function generateForm(Collection $fields, $isTranslation = false, $countTabs = 2)
     {
         $output = '';
         $availableAdminFieldTypes = include(__DIR__ . '/../../resources/fields/laravel_admin.php');
         foreach ($fields->where('is_translation', '=', $isTranslation)->toArray() as $field) {
             if (in_array('nullable', Arr::flatten($field), true)) {
-                $output .= AStr::formatText("\$form->{$availableAdminFieldTypes[$field['type']]}('{$field['name']}', __('admin.{$field['name']}'));", 2);
+                $output .= AStr::formatText("\$form->{$availableAdminFieldTypes[$field['type']]}('{$field['name']}', __('admin.{$field['name']}'));", $countTabs);
             } else {
-                $output .= AStr::formatText("\$form->{$availableAdminFieldTypes[$field['type']]}('{$field['name']}', __('admin.{$field['name']}'))->required();", 2);
+                $output .= AStr::formatText("\$form->{$availableAdminFieldTypes[$field['type']]}('{$field['name']}', __('admin.{$field['name']}'))->required();", $countTabs);
             }
         }
 
@@ -40,6 +40,8 @@ class AdminService
         });
 
 EOF;
+            } else if ($field['name'] == 'is_active') {
+                $output .= AStr::formatText("\$grid->{$field['name']}( __('admin.{$field['name']}'))->editable('select', ActiveHelper::editable());", 2);
             } else {
                 $output .= AStr::formatText("\$grid->{$field['name']}( __('admin.{$field['name']}'))->editable('text');", 2);
             }
@@ -73,25 +75,34 @@ EOF;
         file_put_contents($newControllerPath, $content);
     }
 
-    public static function makeControllerTranslation($models, $fields)
+    public static function makeControllerTranslation(Collection $models, $fields)
     {
-        foreach ($models as $model) {
-            if ($model['template'] == 'controller') {
-                self::makeController(
-                    $model['class'],
-                    self::generateForm($fields),
-                    self::generateGrid($fields) . self::generateGrid($fields, true),
-                    ['{translation_form}', self::generateForm($fields, true)],
-                    __DIR__ . '/../../resources/custom_translation/controller.stub'
-                );
-            } else {
-                self::makeController(
-                    $model['class'],
-                    self::generateForm($fields, true),
-                    self::generateGrid($fields, true)
-                );
-            }
-        }
+        $model = $models->where('template', '=', 'controller')->collapse()->toArray();
+        $translationModel = $models->where('template', '=', 'controller_translation')->collapse()->toArray();
+
+        //MODEL
+        self::makeController(
+            $model['class'],
+            self::generateForm($fields),
+            self::generateGrid($fields) . self::generateGrid($fields, true),
+            ['{translation_form}', self::generateForm($fields, true, 4)],
+            __DIR__ . '/../../resources/custom_translation/controller.stub'
+        );
+
+        //TRANSLATION
+        $model_id = Str::snake($model['class_basename']) . '_id';
+        $model_title = Str::title(str_replace('_', ' ', Str::snake($model['class_basename'])));
+        self::makeController(
+            $translationModel['class'],
+            self::generateForm($fields, true),
+            self::generateGrid($fields, true),
+            [
+                ['{model_id}', '{model_title}', '{model}', '{basename_model}'],
+                [$model_id, $model_title, $model['class'], $model['class_basename']]
+
+            ],
+            __DIR__ . '/../../resources/custom_translation/controller_translation.stub'
+        );
     }
 
     public static function addRoute($basenameModel)
