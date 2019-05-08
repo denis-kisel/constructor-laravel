@@ -81,7 +81,7 @@ class {controllerClass} extends Controller
      */
     protected function grid()
     {
-        $grid = new Grid(new {modelShortName});
+        $grid = new Grid(new {basenameModelClass});
 
         $grid->model()->orderBy('created_at', 'desc');
 
@@ -105,7 +105,7 @@ class {controllerClass} extends Controller
      */
     protected function detail($id)
     {
-        $show = new Show({modelShortName}::findOrFail($id));
+        $show = new Show({basenameModelClass}::findOrFail($id));
         return $show;
     }
 
@@ -116,7 +116,7 @@ class {controllerClass} extends Controller
      */
     protected function form()
     {
-        $form = new Form(new {modelShortName});
+        $form = new Form(new {basenameModelClass});
 
 {form}
         return $form;
