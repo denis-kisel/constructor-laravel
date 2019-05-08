@@ -62,7 +62,7 @@ class ModelCommand extends Command
 
     protected function makeMigration()
     {
-        $stub = __DIR__ . '/../../resources/custom/model.stub';
+        $stub = __DIR__ . '/../../resources/custom/migration.stub';
         MigrationService::create($this->baseNameModelClass(), $stub, ['{fields}', $this->makeMigrationFields()]);
         $this->info('Migration is created!');
 

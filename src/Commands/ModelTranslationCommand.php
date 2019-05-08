@@ -5,6 +5,8 @@ namespace DenisKisel\Constructor\Commands;
 
 use DenisKisel\Constructor\Services\FieldsService;
 use DenisKisel\Constructor\Services\MigrationService;
+use DenisKisel\Constructor\Services\ModelService;
+use DenisKisel\Helper\AStr;
 use Illuminate\Console\Command;
 
 class ModelTranslationCommand extends Command
@@ -37,12 +39,13 @@ class ModelTranslationCommand extends Command
     {
         $this->stopIfModelExists();
         $this->makeModel();
+        $this->bindModels();
         $this->makeMigration();
     }
 
     protected function makeModel()
     {
-        if ($this->option('i')) {
+        if ($this->option('i') && class_exists($this->argument('model'))) {
             return;
         }
         $this->call("make:model", [
@@ -52,6 +55,29 @@ class ModelTranslationCommand extends Command
         $this->call("make:model", [
             'name' => $this->translationModelClass(),
         ]);
+    }
+
+    protected function bindModels()
+    {
+        //MODEL
+        $pathModelClass = AStr::pathByClass($this->argument('model'));
+        $contents = file_get_contents($pathModelClass);
+        $contents = AStr::append(
+            'use Illuminate\Database\Eloquent\Model;',
+            'use Dimsav\Translatable\Translatable;',
+            $contents
+        );
+
+        $contents = AStr::prepend('}', 'use Translatable;', $contents, 1);
+        $contents = AStr::prepend('}', ModelService::generateTranslationAttributes($this->fields()), $contents, 1);
+        $contents = AStr::prepend('}', ModelService::generateTransesMethod($this->translationBaseModelClass()), $contents);
+        file_put_contents($pathModelClass, $contents);
+
+        //TRANSLATION MODEL
+        $pathTranslationModelClass = AStr::pathByClass($this->translationModelClass());
+        $contents = file_get_contents($pathTranslationModelClass);
+        $contents = AStr::prepend('}', ModelService::generateTranslationFillable($this->fields()), $contents, 1);
+        file_put_contents($pathTranslationModelClass, $contents);
     }
 
     protected function baseNameModelClass()
@@ -93,7 +119,7 @@ class ModelTranslationCommand extends Command
     protected function makeMigration()
     {
         foreach ($this->models() as $model) {
-            $stub = __DIR__ . "/../../resources/custom/model.stub";
+            $stub = __DIR__ . "/../../resources/custom/migration.stub";
             MigrationService::create($model['basename_class'], $stub, ['{fields}', $this->makeMigrationFields(
                 ($model['template'] == 'translation_model'),
                 $this->baseNameModelClass()
