@@ -16,7 +16,8 @@ class ModelTranslationCommand extends Command
      * fields: field_name:data_type:length{migration_methods}
      * {type} - string|integer|text
      *
-     * Example: construct:admin App\\Models\\Page name:string,description:text{nullable},is_active:boolean{nullable+default:1}
+     * Example: construct:modelt App\\Models\\Page name:string,description:text{nullable},
+     * is_active:boolean{nullable+default:1}
      *
      * @var string
      */

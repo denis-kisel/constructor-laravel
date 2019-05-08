@@ -14,11 +14,11 @@ class ModelCommand extends Command
      * fields: field_name:data_type:length{migration_methods}
      * {type} - string|integer|text
      *
-     * Example: construct:admin App\\Models\\Page name:string,description:text{nullable},is_active:boolean{nullable+default:1}
+     * Example: construct:model App\\Models\\Page name:string,description:text{nullable},is_active:boolean{nullable+default:1}
      *
      * @var string
      */
-    protected $signature = 'construct:model {model} {fields} {--i} {--m}';
+    protected $signature = 'construct:model {model} {fields} {--i} {--m} {--a}';
 
     /**
      * The console command description.
@@ -38,11 +38,12 @@ class ModelCommand extends Command
         $this->stopIfModelExists();
         $this->makeModel();
         $this->makeMigration();
+        $this->makeAdminController();
     }
 
     protected function makeModel()
     {
-        if ($this->option('i')) {
+        if ($this->option('i')  && class_exists($this->argument('model'))) {
             return;
         }
         $this->call("make:model", [
@@ -74,6 +75,17 @@ class ModelCommand extends Command
     protected function makeMigrationFields()
     {
         return MigrationService::makeMigrationFields($this->fields());
+    }
+
+    protected function makeAdminController()
+    {
+        if ($this->option('a')) {
+            $this->call('construct:admin', [
+                'model' => $this->argument('model'),
+                'fields' => $this->argument('fields'),
+                '--i' => ($this->option('i')) ? '--i' : null,
+            ]);
+        }
     }
 
     protected function stopIfModelExists()
