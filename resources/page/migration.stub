@@ -1,4 +1,21 @@
-$table->string('code')->nullable();
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class Create{class_name}Table extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('{table}', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('code')->nullable();
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('title')->nullable();
@@ -6,5 +23,20 @@ $table->string('code')->nullable();
             $table->string('h1')->nullable();
             $table->text('keywords')->nullable();
             $table->text('meta_description')->nullable();
+{fields}
             $table->boolean('is_active')->default(1);
             $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('{table}');
+    }
+}
+

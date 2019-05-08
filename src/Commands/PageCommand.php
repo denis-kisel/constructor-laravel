@@ -3,6 +3,8 @@
 
 namespace DenisKisel\Constructor\Commands;
 
+use DenisKisel\Constructor\Services\FieldsService;
+use DenisKisel\Constructor\Services\MigrationService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
@@ -13,14 +15,14 @@ class PageCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'construct:page {model}';
+    protected $signature = 'construct:page {model} {--fields=} {--a}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Laravel-admin ready solution';
+    protected $description = 'Constructor of page';
 
     /**
      * Create a new command instance.
@@ -37,88 +39,68 @@ class PageCommand extends Command
      *
      * @return mixed
      */
+
     public function handle()
     {
+        $this->stopIfModelExists();
         $this->makeModel();
-        $this->updateMigration();
-        $this->createAdminController();
-        $this->addRoute();
+        $this->makeMigration();
+        $this->makeAdminController();
     }
 
-    protected function model()
+    protected function stopIfModelExists()
     {
-        return Str::studly($this->argument('model'));
+        if (class_exists($this->className())) {
+            $this->warn("{$this->className()} model is already exists!");
+            die();
+        }
     }
 
-    protected function key()
+    protected function className()
     {
-        $model =  $this->model();
-        return Str::snake($model);
+        return $this->argument('model');
+    }
+
+    protected function basenameClassName()
+    {
+        return class_basename($this->className());
     }
 
     protected function makeModel()
     {
-        $this->call("make:model", [
-            'name' => "App\\Models\\{$this->model()}",
-            '-m' => '-m'
+        $this->call('make:model', [
+            'name' => $this->className()
         ]);
     }
 
-    protected function updateMigration()
+    protected function makeMigration()
     {
-        $files = array_merge(glob(base_path('database/migrations/*.php')), glob("*.php"));
-        $files = array_combine($files, array_map("filemtime", $files));
-        arsort($files);
-        $latestFile = key($files);
+        MigrationService::create(
+            $this->basenameClassName(),
+            __DIR__ . '/../../resources/page/migration.stub',
+            [
+                [
+                    '{class_name}',
+                    '{table}',
+                    '{fields}'
+                ],
+                [
+                    Str::plural($this->basenameClassName()),
+                    Str::plural(Str::snake($this->basenameClassName())),
+                    MigrationService::generateMigrationFields(
+                        FieldsService::parse($this->option('fields')), false, null, false, false
+                    )
+                ]
+            ]
+        );
 
-        $content = file_get_contents($latestFile);
-
-        $migrationStub = __DIR__ . "/../../resources/page/migration.stub";
-        $content = str_replace('$table->timestamps();', file_get_contents($migrationStub), $content);
-
-        file_put_contents($latestFile, $content);
-        $this->info('Migration is updated!');
-        $this->call('migrate');
+//        $this->call('migrate');
     }
 
-    protected function createAdminController()
+    protected function makeAdminController()
     {
-        $controllerStubPath = __DIR__ . "/../../resources/page/controller.stub";
-        $newControllerPath = app_path("Admin/Controllers/{$this->model()}Controller.php");
-        copy($controllerStubPath, $newControllerPath);
-
-        $content = file_get_contents($newControllerPath);
-        $content = str_replace('{model}', $this->model(), $content);
-        $content = str_replace('{key}', $this->key(), $content);
-
-        file_put_contents($newControllerPath, $content);
-        $this->info('Admin controller is created!');
-    }
-
-    protected function addRoute()
-    {
-        $routesPath = app_path('Admin/routes.php');
-
-        $newRoute = "\$router->resource('{$this->slug()}', '{$this->model()}Controller');";
-
-        $src = '], function (Router $router) {';
-        $replace = <<<EOF
-], function (Router \$router) {
-    $newRoute
-EOF;
-        $content = file_get_contents($routesPath);
-
-        if (strpos($content, "{$this->model()}Controller") !== false) {
-            $this->info('Admin route already exists!');
-        } else {
-            $content = str_replace($src, $replace, $content);
-            file_put_contents($routesPath, $content);
-            $this->info('Admin route is created!');
+        if ($this->option('a')) {
+            $this->call('construct:admin_page');
         }
-    }
-
-    protected function slug()
-    {
-        return Str::slug(Str::plural($this->key()));
     }
 }

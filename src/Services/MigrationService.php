@@ -28,9 +28,13 @@ class MigrationService
         file_put_contents($migrationPath, $content);
     }
 
-    public static function generateMigrationFields($fields, $isTranslation = false, $className = null)
+    public static function generateMigrationFields($fields, $isTranslation = false, $className = null, $isId = true, $isTimestamp = true)
     {
-        $output = AStr::formatText('$table->increments(\'id\');');
+        if ($isId) {
+            $output = AStr::formatText('$table->increments(\'id\');');
+        } else {
+            $output = '';
+        }
 
         if ($isTranslation) {
             $model_id = Str::snake($className) . '_id';
@@ -54,7 +58,10 @@ class MigrationService
                 $output .= AStr::formatText("\$table->{$field['type']}('{$field['name']}'){$migrationMethods};", 3);
             }
         }
-        $output .= AStr::formatText('$table->timestamps();', 3);
+
+        if ($isTimestamp) {
+            $output .= AStr::formatText('$table->timestamps();', 3);
+        }
 
         return $output;
     }

@@ -96,8 +96,6 @@ class ConstructorServiceProvider extends ServiceProvider
          $this->commands([
              PageCommand::class,
              CategoryProductCommand::class,
-             CustomCommand::class,
-             CustomTranslationCommand::class,
              ModelCommand::class,
              ModelTranslationCommand::class,
              AdminCommand::class,
