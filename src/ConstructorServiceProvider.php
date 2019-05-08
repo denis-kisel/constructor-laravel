@@ -3,6 +3,7 @@
 namespace DenisKisel\Constructor;
 
 use DenisKisel\Constructor\Commands\AdminCommand;
+use DenisKisel\Constructor\Commands\AdminTranslationCommand;
 use DenisKisel\Constructor\Commands\CategoryProductCommand;
 use DenisKisel\Constructor\Commands\CustomCommand;
 use DenisKisel\Constructor\Commands\CustomTranslationCommand;
@@ -98,6 +99,7 @@ class ConstructorServiceProvider extends ServiceProvider
              ModelCommand::class,
              ModelTranslationCommand::class,
              AdminCommand::class,
+             AdminTranslationCommand::class,
          ]);
     }
 }

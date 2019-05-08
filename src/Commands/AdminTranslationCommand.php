@@ -7,7 +7,7 @@ use DenisKisel\Constructor\Services\AdminService;
 use DenisKisel\Constructor\Services\FieldsService;
 use Illuminate\Console\Command;
 
-class AdminCommand extends Command
+class AdminTranslationCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -76,16 +76,14 @@ class AdminCommand extends Command
 
     protected function makeController()
     {
-        foreach ($this->models() as $model) {
-            AdminService::makeControllerTranslation($model, $this->fields());
-            $this->info("Admin {$this->baseNameModelClass()}Controller is created!");
-        }
+        AdminService::makeControllerTranslation($this->models(), $this->fields());
+        $this->info("Admin {$this->baseNameModelClass()}Controller is created!");
     }
 
     protected function addRoute()
     {
         foreach ($this->models() as $model) {
-            $this->info(AdminService::addRoute($this->baseNameModelClass($model['class'])));
+            $this->info(AdminService::addRoute(class_basename($model['class'])));
         }
     }
 
