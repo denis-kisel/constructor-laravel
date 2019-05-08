@@ -11,13 +11,10 @@ class AdminCommand extends Command
 {
     /**
      * The name and signature of the console command.
-     * fields: field_name:{type}:{length}[null]
+     * fields: field_name:data_type:length{migration_methods}
      * {type} - string|integer|text
      *
      * Example: construct:admin App\\Models\\Page name:string,description:text{nullable},is_active:boolean{nullable+default:1}
-     * {--i}
-     *
-     * ct - custom translation
      *
      * @var string
      */
