@@ -10,9 +10,9 @@ use Illuminate\Support\Str;
 
 class MigrationService
 {
-    public static function create($className, $stub, $replacer = [])
+    public static function create($basenameModelName, $stub, $replacer = [])
     {
-        $table = Str::plural(Str::snake($className));
+        $table = Str::plural(Str::snake($basenameModelName));
         $migrationPath = database_path('migrations/' . date('Y_m_d_His') . "_create_{$table}_table.php");
         copy($stub, $migrationPath);
 

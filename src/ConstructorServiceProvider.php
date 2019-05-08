@@ -7,6 +7,8 @@ use DenisKisel\Constructor\Commands\AdminTranslationCommand;
 use DenisKisel\Constructor\Commands\CategoryProductCommand;
 use DenisKisel\Constructor\Commands\CustomCommand;
 use DenisKisel\Constructor\Commands\CustomTranslationCommand;
+use DenisKisel\Constructor\Commands\InstallAdminLocaleCommand;
+use DenisKisel\Constructor\Commands\InstallLocaleCommand;
 use DenisKisel\Constructor\Commands\ModelCommand;
 use DenisKisel\Constructor\Commands\ModelTranslationCommand;
 use DenisKisel\Constructor\Commands\PageCommand;
@@ -100,6 +102,8 @@ class ConstructorServiceProvider extends ServiceProvider
              ModelTranslationCommand::class,
              AdminCommand::class,
              AdminTranslationCommand::class,
+             InstallLocaleCommand::class,
+             InstallAdminLocaleCommand::class,
          ]);
     }
 }

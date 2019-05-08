@@ -1,0 +1,129 @@
+<?php
+
+namespace App\Admin\Controllers;
+
+use App\Helpers\ActiveHelper;
+use App\Models\Locale;
+use App\Http\Controllers\Controller;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+
+class LocaleController extends Controller
+{
+    use HasResourceActions;
+
+    /**
+     * Index interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function index(Content $content)
+    {
+        return $content
+            ->header(__('admin.locales'))
+            ->description(' ')
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->header('Detail')
+            ->description('description')
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->header(__('admin.edit'))
+            ->description(' ')
+            ->body($this->form()->edit($id));
+    }
+
+    /**
+     * Create interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function create(Content $content)
+    {
+        return $content
+            ->header(__('admin.create'))
+            ->description(' ')
+            ->body($this->form());
+    }
+
+    /**
+     * Make a grid builder.
+     *
+     * @return Grid
+     */
+    protected function grid()
+    {
+        $grid = new Grid(new Locale);
+
+        $grid->id(__('admin.id'));
+        $grid->code(__('admin.code'));
+        $grid->name(__('admin.name'))->editable('text');
+        $grid->sort(__('admin.sort'))->editable('text');
+        $grid->is_active(__('admin.active'))->editable('select', ActiveHelper::editable());
+
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+        });
+
+        return $grid;
+    }
+
+    /**
+     * Make a show builder.
+     *
+     * @param mixed $id
+     * @return Show
+     */
+    protected function detail($id)
+    {
+        $show = new Show(Locale::findOrFail($id));
+
+
+
+        return $show;
+    }
+
+    /**
+     * Make a form builder.
+     *
+     * @return Form
+     */
+    protected function form()
+    {
+        $form = new Form(new Locale);
+
+        $form->text('code', __('admin.code'))->help('Напр: ru, en')->required();
+        $form->text('name', __('admin.name'))->required();
+        $form->number('sort', __('admin.sort'))->default(0);
+        $form->switch('is_active', __('admin.active'))->default(1);
+
+        return $form;
+    }
+}
