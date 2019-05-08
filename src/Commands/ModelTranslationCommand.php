@@ -135,7 +135,7 @@ class ModelTranslationCommand extends Command
 
     protected function makeMigrationFields($isTranslation, $modelClassName)
     {
-        return MigrationService::makeMigrationFields($this->fields(), $isTranslation, $modelClassName);
+        return MigrationService::generateMigrationFields($this->fields(), $isTranslation, $modelClassName);
     }
 
     protected function stopIfModelExists()

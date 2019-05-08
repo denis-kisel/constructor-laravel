@@ -52,7 +52,12 @@ class AdminCommand extends Command
 
     protected function makeController()
     {
-        AdminService::makeController($this->argument('model'), $this->fields());
+        AdminService::makeController(
+            $this->argument('model'),
+            AdminService::generateForm($this->fields()),
+            AdminService::generateGrid($this->fields())
+        );
+
         $this->info("Admin {$this->baseNameModelClass()}Controller is created!");
     }
 

@@ -28,13 +28,14 @@ class MigrationService
         file_put_contents($migrationPath, $content);
     }
 
-    public static function makeMigrationFields($fields, $isTranslation = false, $className = null)
+    public static function generateMigrationFields($fields, $isTranslation = false, $className = null)
     {
         $output = AStr::formatText('$table->increments(\'id\');');
 
         if ($isTranslation) {
             $model_id = Str::snake($className) . '_id';
             $output .= AStr::formatText("\$table->integer('{$model_id}');", 3);
+            $output .= AStr::formatText("\$table->string('locale')->index();", 3);
         }
 
         $availableFieldTypes = include(__DIR__ . '/../../resources/fields/migration.php');

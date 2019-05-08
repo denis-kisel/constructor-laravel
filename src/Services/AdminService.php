@@ -13,11 +13,11 @@ class AdminService
 {
     public static $adminControllerStub = __DIR__ . '/../../resources/custom/admin_controller.stub';
 
-    public static function generateForm(Collection $fields)
+    public static function generateForm(Collection $fields, $isTranslation = false)
     {
         $output = '';
         $availableAdminFieldTypes = include(__DIR__ . '/../../resources/fields/laravel_admin.php');
-        foreach ($fields->toArray() as $field) {
+        foreach ($fields->where('is_translation', '=', $isTranslation)->toArray() as $field) {
             if (in_array('nullable', Arr::flatten($field), true)) {
                 $output .= AStr::formatText("\$form->{$availableAdminFieldTypes[$field['type']]}('{$field['name']}', __('admin.{$field['name']}'));", 2);
             } else {
@@ -28,10 +28,10 @@ class AdminService
         return $output;
     }
 
-    public static function generateGrid(Collection $fields)
+    public static function generateGrid(Collection $fields, $isTranslation = false)
     {
         $output = '';
-        foreach ($fields->toArray() as $field) {
+        foreach ($fields->where('is_translation', '=', $isTranslation)->toArray() as $field) {
             if ($field['name'] == 'image') {
                 $output .= <<<EOF
         \$grid->{$field['name']}( __('admin.{$field['name']}'))->display(function(\$image) {
@@ -47,7 +47,7 @@ EOF;
         return $output;
     }
 
-    public static function makeController($modelClass, $fields, $replaces = null, $stub = null)
+    public static function makeController($modelClass, $form, $grid, $replaces = null, $stub = null)
     {
         $basenameModelClass = class_basename($modelClass);
         $controllerStubPath = (is_null($stub)) ? self::$adminControllerStub : $stub;
@@ -63,14 +63,35 @@ EOF;
         $content = str_replace('{controllerClass}', "{$basenameModelClass}Controller", $content);
         $content = str_replace('{modelClass}', "{$modelClass}", $content);
         $content = str_replace('{title}', $title, $content);
-        $content = str_replace('{form}', self::generateForm($fields), $content);
-        $content = str_replace('{grid}', self::generateGrid($fields), $content);
+        $content = str_replace('{form}', $form, $content);
+        $content = str_replace('{grid}', $grid, $content);
 
         if (!is_null($replaces)) {
             $content = str_replace($replaces[0], $replaces[1], $content);
         }
 
         file_put_contents($newControllerPath, $content);
+    }
+
+    public static function makeControllerTranslation($models, $fields)
+    {
+        foreach ($models as $model) {
+            if ($model['template'] == 'controller') {
+                self::makeController(
+                    $model['class'],
+                    self::generateForm($fields),
+                    self::generateGrid($fields) . self::generateGrid($fields, true),
+                    ['{translation_form}', self::generateForm($fields, true)],
+                    __DIR__ . '/../../resources/custom_translation/controller.stub'
+                );
+            } else {
+                self::makeController(
+                    $model['class'],
+                    self::generateForm($fields, true),
+                    self::generateGrid($fields, true)
+                );
+            }
+        }
     }
 
     public static function addRoute($basenameModel)

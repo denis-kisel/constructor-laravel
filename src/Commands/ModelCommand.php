@@ -74,7 +74,7 @@ class ModelCommand extends Command
 
     protected function makeMigrationFields()
     {
-        return MigrationService::makeMigrationFields($this->fields());
+        return MigrationService::generateMigrationFields($this->fields());
     }
 
     protected function makeAdminController()
