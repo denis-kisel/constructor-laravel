@@ -6,6 +6,7 @@ use DenisKisel\Constructor\Commands\CategoryProductCommand;
 use DenisKisel\Constructor\Commands\CustomCommand;
 use DenisKisel\Constructor\Commands\CustomTranslationCommand;
 use DenisKisel\Constructor\Commands\ModelCommand;
+use DenisKisel\Constructor\Commands\ModelTranslationCommand;
 use DenisKisel\Constructor\Commands\PageCommand;
 use Illuminate\Support\ServiceProvider;
 
@@ -94,6 +95,7 @@ class ConstructorServiceProvider extends ServiceProvider
              CustomCommand::class,
              CustomTranslationCommand::class,
              ModelCommand::class,
+             ModelTranslationCommand::class,
          ]);
     }
 }

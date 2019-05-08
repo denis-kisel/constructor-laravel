@@ -25,7 +25,7 @@ class ModelCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Laravel-admin ready solution';
+    protected $description = 'Constructor for models';
 
 
     /**
@@ -62,7 +62,7 @@ class ModelCommand extends Command
 
     protected function makeMigration()
     {
-        $stub = __DIR__ . '/../../resources/custom/migration.stub';
+        $stub = __DIR__ . '/../../resources/custom/model.stub';
         MigrationService::create($this->baseNameModelClass(), $stub, ['{fields}', $this->makeMigrationFields()]);
         $this->info('Migration is created!');
 
