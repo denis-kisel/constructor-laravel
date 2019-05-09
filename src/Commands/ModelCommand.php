@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 
 class ModelCommand extends Command
 {
-    protected $migrationStub = __DIR__ . '/../../resources/custom/migration.stub';
+    protected $migrationStubPath = __DIR__ . '/../../resources/custom/migration.stub';
     /**
      * The name and signature of the console command.
      * fields: field_name:data_type:length{migration_methods}
@@ -19,7 +19,7 @@ class ModelCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'construct:model {model} {fields} {--i} {--m} {--a}';
+    protected $signature = 'construct:model {model} {--fields=} {--i} {--m} {--a} {--mig_stub=} {--mig_replacer=}';
 
     /**
      * The console command description.
@@ -68,7 +68,7 @@ class ModelCommand extends Command
     {
         MigrationService::create(
             $this->baseNameModelClass(),
-            $this->migrationStub,
+            $this->stubPath(),
             $this->replacer()
         );
 
@@ -84,7 +84,7 @@ class ModelCommand extends Command
         if ($this->option('a')) {
             $this->call('construct:admin', [
                 'model' => $this->nameModelClass(),
-                'fields' => $this->argument('fields'),
+                'fields' => $this->stringFields(),
                 '--i' => ($this->option('i')) ? '--i' : null,
             ]);
         }
@@ -93,7 +93,7 @@ class ModelCommand extends Command
     //HELPERS
     protected function nameModelClass()
     {
-        return class_basename($this->argument('model'));
+        return $this->argument('model');
     }
 
     protected function baseNameModelClass()
@@ -101,16 +101,35 @@ class ModelCommand extends Command
         return class_basename($this->nameModelClass());
     }
 
-    protected function fields()
+    protected function stringFields()
     {
-        return FieldsService::parse($this->argument('fields'));
+        return $this->option('fields');
+    }
+
+    protected function arrayFields()
+    {
+        return FieldsService::parse($this->stringFields());
+    }
+
+    protected function stubPath()
+    {
+        $output = $this->migrationStubPath;
+        if ($this->option('mig_stub')) {
+            $output = $this->option('mig_stub');
+        }
+
+        return $output;
     }
 
     protected function replacer()
     {
+        if ($this->option('mig_replacer')) {
+            return json_decode($this->option('mig_replacer'));
+        }
+
         return  [
             '{fields}',
-            MigrationService::generateMigrationFields($this->fields())
+            MigrationService::generateMigrationFields($this->arrayFields())
         ];
     }
 }

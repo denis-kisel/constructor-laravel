@@ -3,32 +3,39 @@
 
 namespace DenisKisel\Constructor\Commands;
 
-class InstallLocaleCommand extends ModelCommand
+use Illuminate\Console\Command;
+
+class InstallLocaleCommand extends Command
 {
     protected $signature = 'install:locale {--m} {--i} {--a}';
     protected $description = 'Constructor for locale';
-    protected $migrationStub = __DIR__ . '/../../resources/locale/migration.stub';
 
-    protected function makeAdminController()
+    public function handle()
     {
-        if ($this->option('a')) {
-            $this->call('install:admin_locale');
-        }
+        $this->callModel();
+        $this->callAdmin();
+    }
+
+    //STACK
+    protected function callModel()
+    {
+        $this->call('construct:model', [
+            'model' => $this->nameModelClass(),
+            '--mig_stub' => __DIR__ . '/../../resources/locale/migration.stub',
+            '--mig_replacer' => json_encode(false),
+            '--m' => ($this->option('m')),
+            '--i' => ($this->option('i')),
+        ]);
+    }
+
+    protected function callAdmin()
+    {
+
     }
 
     //HELPER
     protected function nameModelClass()
     {
         return 'App\\Models\\Locale';
-    }
-
-    protected function fields()
-    {
-        return [];
-    }
-
-    protected function replacer()
-    {
-        return  [];
     }
 }
