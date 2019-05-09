@@ -20,8 +20,7 @@ class AdminPageCommand extends Command
         $this->call('construct:admin', [
             'model' => $this->argument('model'),
             '--fields' => $this->option('fields'),
-            '--i' => $this->option('i'),
-            '--controller_stub' => __DIR__ . '/../../resources/page/admin_controller.stub'
+            '--i' => $this->option('i')
         ]);
     }
 }

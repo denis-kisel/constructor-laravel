@@ -7,6 +7,7 @@ $output = [
     'h1:string{nullable}[t]',
     'keywords:text{nullable}[t]',
     'meta_description:text{nullable}[t]',
+    '{option_fields}',
     'sort:integer{default:0}',
     'is_active:boolean{default:1}'
 ];

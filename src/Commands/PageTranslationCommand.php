@@ -44,8 +44,10 @@ class PageTranslationCommand extends Command
     {
         $fields = include(__DIR__ . '/../../resources/patterns/page.php');
         if ($this->option('fields')) {
-            $fields .= ',' . $this->option('fields');
+            $fields = str_replace('{option_fields}', $this->option('fields'), $fields);
         }
+
+        $fields = str_replace(',{option_fields}', '', $fields);
         return $fields;
     }
 }
