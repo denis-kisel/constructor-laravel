@@ -9,6 +9,7 @@ use Illuminate\Console\Command;
 
 class ModelCommand extends Command
 {
+    protected $migrationStub = __DIR__ . '/../../resources/custom/migration.stub';
     /**
      * The name and signature of the console command.
      * fields: field_name:data_type:length{migration_methods}
@@ -41,30 +42,36 @@ class ModelCommand extends Command
         $this->makeAdminController();
     }
 
+    //STACK
+    protected function stopIfModelExists()
+    {
+        if ($this->option('i')) {
+            return;
+        }
+        if (class_exists($this->nameModelClass())) {
+            $this->warn('This model is already exists!');
+            die();
+        }
+    }
+
     protected function makeModel()
     {
-        if ($this->option('i')  && class_exists($this->argument('model'))) {
+        if ($this->option('i')  && class_exists($this->nameModelClass())) {
             return;
         }
         $this->call("make:model", [
-            'name' => $this->argument('model'),
+            'name' => $this->nameModelClass(),
         ]);
-    }
-
-    protected function baseNameModelClass()
-    {
-        return class_basename($this->argument('model'));
-    }
-
-    protected function fields()
-    {
-        return FieldsService::parse($this->argument('fields'));
     }
 
     protected function makeMigration()
     {
-        $stub = __DIR__ . '/../../resources/custom/migration.stub';
-        MigrationService::create($this->baseNameModelClass(), $stub, ['{fields}', $this->makeMigrationFields()]);
+        MigrationService::create(
+            $this->baseNameModelClass(),
+            $this->migrationStub,
+            $this->replacer()
+        );
+
         $this->info('Migration is created!');
 
         if ($this->option('m')) {
@@ -72,30 +79,38 @@ class ModelCommand extends Command
         }
     }
 
-    protected function makeMigrationFields()
-    {
-        return MigrationService::generateMigrationFields($this->fields());
-    }
-
     protected function makeAdminController()
     {
         if ($this->option('a')) {
             $this->call('construct:admin', [
-                'model' => $this->argument('model'),
+                'model' => $this->nameModelClass(),
                 'fields' => $this->argument('fields'),
                 '--i' => ($this->option('i')) ? '--i' : null,
             ]);
         }
     }
 
-    protected function stopIfModelExists()
+    //HELPERS
+    protected function nameModelClass()
     {
-        if ($this->option('i')) {
-            return;
-        }
-        if (class_exists($this->argument('model'))) {
-            $this->warn('This model is already exists!');
-            die();
-        }
+        return class_basename($this->argument('model'));
+    }
+
+    protected function baseNameModelClass()
+    {
+        return class_basename($this->nameModelClass());
+    }
+
+    protected function fields()
+    {
+        return FieldsService::parse($this->argument('fields'));
+    }
+
+    protected function replacer()
+    {
+        return  [
+            '{fields}',
+            MigrationService::generateMigrationFields($this->fields())
+        ];
     }
 }
