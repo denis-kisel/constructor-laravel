@@ -5,21 +5,24 @@ namespace DenisKisel\Constructor\Commands;
 
 use DenisKisel\Constructor\Services\FieldsService;
 use DenisKisel\Constructor\Services\MigrationService;
+use DenisKisel\Constructor\Services\ModelService;
 use Illuminate\Console\Command;
 
 class ModelCommand extends Command
 {
     protected $migrationStubPath = __DIR__ . '/../../resources/custom/migration.stub';
+    protected $modelStubPath = __DIR__ . '/../../resources/custom/model.stub';
+
     /**
      * The name and signature of the console command.
      * fields: field_name:data_type:length{migration_methods}
      * {type} - string|integer|text
      *
-     * Example: construct:model App\\Models\\Page name:string,description:text{nullable},is_active:boolean{nullable+default:1}
+     * Example: construct:model App\\Models\\Page --fields=name:string,description:text{nullable},is_active:boolean{nullable+default:1}
      *
      * @var string
      */
-    protected $signature = 'construct:model {model} {--fields=} {--i} {--m} {--a} {--mig_stub=} {--mig_replacer=}';
+    protected $signature = 'construct:model {model} {--fields=} {--i} {--m} {--a} {--mig_stub=} {--mig_replacer=} {--model_stub} {--model_replacer}';
 
     /**
      * The console command description.
@@ -56,21 +59,16 @@ class ModelCommand extends Command
 
     protected function makeModel()
     {
-        if ($this->option('i')  && class_exists($this->nameModelClass())) {
-            return;
-        }
-        $this->call("make:model", [
-            'name' => $this->nameModelClass(),
-        ]);
+        ModelService::create($this->nameModelClass(), $this->modelStubPath(), $this->modelReplacer());
     }
 
     protected function makeMigration()
     {
         MigrationService::create(
             $this->baseNameModelClass(),
-            $this->arrayFields(),
-            $this->stubPath(),
-            $this->replacer()
+            MigrationService::generateMigrationFields($this->arrayFields()),
+            $this->migrationStubPath(),
+            $this->migrationReplacer()
         );
 
         $this->info('Migration is created!');
@@ -112,7 +110,7 @@ class ModelCommand extends Command
         return FieldsService::parse($this->stringFields());
     }
 
-    protected function stubPath()
+    protected function migrationStubPath()
     {
         $output = $this->migrationStubPath;
         if ($this->option('mig_stub')) {
@@ -122,10 +120,27 @@ class ModelCommand extends Command
         return $output;
     }
 
-    protected function replacer()
+    protected function migrationReplacer()
     {
         if ($this->option('mig_replacer')) {
             return json_decode($this->option('mig_replacer'));
+        }
+    }
+
+    protected function modelStubPath()
+    {
+        $output = $this->modelStubPath;
+        if ($this->option('model_stub')) {
+            $output = $this->option('model_stub');
+        }
+
+        return $output;
+    }
+
+    protected function modelReplacer()
+    {
+        if ($this->option('model_replacer')) {
+            return json_decode($this->option('model_replacer'));
         }
     }
 }

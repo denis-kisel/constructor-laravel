@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class MigrationService
 {
-    public static function create($basenameModelName, $arrayFields, $stub, $replacer = [])
+    public static function create($basenameModelName, $generatedFields, $stub, $replacer = [])
     {
         $table = Str::plural(Str::snake($basenameModelName));
         $migrationPath = database_path('migrations/' . date('Y_m_d_His') . "_create_{$table}_table.php");
@@ -20,7 +20,7 @@ class MigrationService
         $class = Str::studly($table);
         $content = str_replace('{class}', "Create{$class}Table", $content);
         $content = str_replace('{table}', $table, $content);
-        $content = str_replace('{fields}', self::generateMigrationFields($arrayFields), $content);
+        $content = str_replace('{fields}', $generatedFields, $content);
 
         if ($replacer) {
             $content = str_replace($replacer[0], $replacer[1], $content);
@@ -29,23 +29,12 @@ class MigrationService
         file_put_contents($migrationPath, $content);
     }
 
-    public static function generateMigrationFields($fields, $isTranslation = false, $className = null, $isId = true, $isTimestamp = true)
+    public static function generateMigrationFields($fields)
     {
-        if ($isId) {
-            $output = AStr::formatText('$table->increments(\'id\');');
-        } else {
-            $output = '';
-        }
-
-        if ($isTranslation) {
-            $model_id = Str::snake($className) . '_id';
-            $output .= AStr::formatText("\$table->integer('{$model_id}');", 3);
-            $output .= AStr::formatText("\$table->string('locale')->index();", 3);
-        }
-
+        $output = '';
         $availableFieldTypes = include(__DIR__ . '/../../resources/fields/migration.php');
 
-        foreach ($fields->where('is_translation', '=', $isTranslation)->toArray() as $field) {
+        foreach ($fields->toArray() as $field) {
 
             if (!in_array($field['type'], $availableFieldTypes)) {
                 throw new MigrationException('Not available field - ' . $field['type'] . '. ' . __FILE__ . ':' .
@@ -59,11 +48,6 @@ class MigrationService
                 $output .= AStr::formatText("\$table->{$field['type']}('{$field['name']}'){$migrationMethods};", 3);
             }
         }
-
-        if ($isTimestamp) {
-            $output .= AStr::formatText('$table->timestamps();', 3);
-        }
-
         return $output;
     }
 

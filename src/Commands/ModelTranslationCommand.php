@@ -4,10 +4,10 @@
 namespace DenisKisel\Constructor\Commands;
 
 use DenisKisel\Constructor\Services\FieldsService;
-use DenisKisel\Constructor\Services\MigrationService;
 use DenisKisel\Constructor\Services\ModelService;
 use DenisKisel\Helper\AStr;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class ModelTranslationCommand extends Command
 {
@@ -20,7 +20,7 @@ class ModelTranslationCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'construct:modelt {model} {fields} {--i} {--m} {--a}';
+    protected $signature = 'construct:modelt {model} {--fields=} {--i} {--m} {--a}';
 
     /**
      * The console command description.
@@ -37,25 +37,25 @@ class ModelTranslationCommand extends Command
      */
     public function handle()
     {
-        $this->stopIfModelExists();
-        $this->makeModel();
+        $this->callModels();
         $this->bindModels();
-        $this->makeMigration();
-        $this->makeAdminControllers();
+        $this->callAdmins();
     }
 
-    protected function makeModel()
+    //STACK
+    protected function callModels()
     {
-        if ($this->option('i') && class_exists($this->argument('model'))) {
-            return;
+        foreach ($this->models() as $model) {
+            $this->call('construct:model', [
+                'model' => $model['class'],
+                '--fields' => $this->getStringFieldsByType($model['template'] == 'translation_model'),
+                '--i' => $this->option('i'),
+                '--m' => $this->option('m'),
+                '--mig_stub' => $model['stub'],
+                '--mig_replacer' => json_encode($this->replacer())
+            ]);
+            sleep(1);
         }
-        $this->call("make:model", [
-            'name' => $this->argument('model'),
-        ]);
-
-        $this->call("make:model", [
-            'name' => $this->translationModelClass(),
-        ]);
     }
 
     protected function bindModels()
@@ -70,15 +70,45 @@ class ModelTranslationCommand extends Command
         );
 
         $contents = AStr::prepend('}', 'use Translatable;', $contents, 1);
-        $contents = AStr::prepend('}', ModelService::generateTranslationAttributes($this->fields()), $contents, 1);
+        $contents = AStr::prepend('}', ModelService::generateTranslationAttributes($this->arrayFields()), $contents, 1);
         $contents = AStr::prepend('}', ModelService::generateTransesMethod($this->translationBaseModelClass()), $contents);
         file_put_contents($pathModelClass, $contents);
 
         //TRANSLATION MODEL
         $pathTranslationModelClass = AStr::pathByClass($this->translationModelClass());
         $contents = file_get_contents($pathTranslationModelClass);
-        $contents = AStr::prepend('}', ModelService::generateTranslationFillable($this->fields()), $contents, 1);
+        $contents = AStr::prepend('}', ModelService::generateTranslationFillable($this->arrayFields()), $contents, 1);
         file_put_contents($pathTranslationModelClass, $contents);
+    }
+
+    protected function callAdmins()
+    {
+        if ($this->option('a')) {
+            $this->call('construct:admint', [
+                'model' => $this->argument('model'),
+                'fields' => $this->stringFields(),
+                '--i' => $this->option('i')
+            ]);
+        }
+    }
+
+    //HELPERS
+    protected function models()
+    {
+        return [
+            [
+                'class' => $this->argument('model'),
+                'basename_class' => $this->baseNameModelClass(),
+                'template' => 'model',
+                'stub' => __DIR__ . '/../../resources/custom/migration.stub'
+            ],
+            [
+                'class' => $this->translationModelClass(),
+                'basename_class' => $this->translationBaseModelClass(),
+                'template' => 'translation_model',
+                'stub' => __DIR__ . '/../../resources/custom_translation/migration.stub'
+            ]
+        ];
     }
 
     protected function baseNameModelClass()
@@ -96,73 +126,38 @@ class ModelTranslationCommand extends Command
         return class_basename($this->translationModelClass());
     }
 
-    protected function fields()
+    protected function stringFields()
     {
-        return FieldsService::parse($this->argument('fields'));
+        return $this->option('fields');
     }
 
-    protected function models()
+    protected function arrayFields()
     {
-        return [
-            [
-                'class' => $this->argument('model'),
-                'basename_class' => $this->baseNameModelClass(),
-                'template' => 'model'
-            ],
-            [
-                'class' => $this->translationModelClass(),
-                'basename_class' => $this->translationBaseModelClass(),
-                'template' => 'translation_model'
-            ]
-        ];
+        return FieldsService::parse($this->stringFields());
     }
 
-    protected function makeMigration()
+    protected function getStringFieldsByType($isTranslation = false)
     {
-        foreach ($this->models() as $model) {
-            $stub = __DIR__ . "/../../resources/custom/migration.stub";
-            MigrationService::create($model['basename_class'], $stub, ['{fields}', $this->makeMigrationFields(
-                ($model['template'] == 'translation_model'),
-                $this->baseNameModelClass()
-            )]);
-            $this->info('Migration is created!');
-
-            if ($this->option('m')) {
-                $this->call('migrate');
+        $output = [];
+        if ($this->stringFields()) {
+            foreach (explode(',', $this->stringFields()) as $item) {
+                if (
+                    !Str::contains($item, '[t]') && !$isTranslation
+                    || Str::contains($item, '[t]') && $isTranslation
+                ) {
+                    $output[] = $item;
+                }
             }
         }
+
+        return implode(',', $output);
     }
 
-    protected function makeMigrationFields($isTranslation, $modelClassName)
+    protected function replacer()
     {
-        return MigrationService::generateMigrationFields($this->fields(), $isTranslation, $modelClassName);
-    }
-
-    protected function makeAdminControllers()
-    {
-        if ($this->option('a')) {
-            $this->call('construct:admint', [
-                'model' => $this->argument('model'),
-                'fields' => $this->argument('fields'),
-                '--i' => ($this->option('i')) ? '--i' : null
-            ]);
-        }
-    }
-
-    protected function stopIfModelExists()
-    {
-        if ($this->option('i')) {
-            return;
-        }
-
-        if (class_exists($this->argument('model'))) {
-            $this->warn('This model is already exists!');
-            die();
-        }
-
-        if (class_exists($this->translationModelClass())) {
-            $this->warn('This translation model is already exists!');
-            die();
-        }
+        return [
+            '{belong_table_id}',
+            Str::snake($this->baseNameModelClass()) . '_id'
+        ];
     }
 }
