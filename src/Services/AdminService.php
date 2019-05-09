@@ -6,18 +6,15 @@ namespace DenisKisel\Constructor\Services;
 
 use Illuminate\Support\Arr;
 use DenisKisel\Helper\AStr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class AdminService
 {
-    public static $adminControllerStub = __DIR__ . '/../../resources/custom/admin_controller.stub';
-
-    public static function generateForm(Collection $fields, $isTranslation = false, $countTabs = 2)
+    public static function generateForm(Array $fields, $countTabs = 2)
     {
         $output = '';
         $availableAdminFieldTypes = include(__DIR__ . '/../../resources/fields/laravel_admin.php');
-        foreach ($fields->where('is_translation', '=', $isTranslation)->toArray() as $field) {
+        foreach ($fields as $field) {
             if (in_array('nullable', Arr::flatten($field), true)) {
                 $output .= AStr::formatText("\$form->{$availableAdminFieldTypes[$field['type']]}('{$field['name']}', __('admin.{$field['name']}'));", $countTabs);
             } else {
@@ -28,10 +25,10 @@ class AdminService
         return $output;
     }
 
-    public static function generateGrid(Collection $fields, $isTranslation = false)
+    public static function generateGrid(Array $fields)
     {
         $output = '';
-        foreach ($fields->where('is_translation', '=', $isTranslation)->toArray() as $field) {
+        foreach ($fields as $field) {
             if ($field['name'] == 'image') {
                 $output .= <<<EOF
         \$grid->{$field['name']}( __('admin.{$field['name']}'))->display(function(\$image) {
@@ -73,36 +70,6 @@ EOF;
         }
 
         file_put_contents($newControllerPath, $content);
-    }
-
-    public static function makeControllerTranslation(Collection $models, $fields)
-    {
-        $model = $models->where('template', '=', 'controller')->collapse()->toArray();
-        $translationModel = $models->where('template', '=', 'controller_translation')->collapse()->toArray();
-
-        //MODEL
-        self::makeController(
-            $model['class'],
-            self::generateForm($fields),
-            self::generateGrid($fields) . self::generateGrid($fields, true),
-            ['{translation_form}', self::generateForm($fields, true, 4)],
-            __DIR__ . '/../../resources/custom_translation/controller.stub'
-        );
-
-        //TRANSLATION
-        $model_id = Str::snake($model['class_basename']) . '_id';
-        $model_title = Str::title(str_replace('_', ' ', Str::snake($model['class_basename'])));
-        self::makeController(
-            $translationModel['class'],
-            self::generateForm($fields, true),
-            self::generateGrid($fields, true),
-            [
-                ['{model_id}', '{model_title}', '{model}', '{basename_model}'],
-                [$model_id, $model_title, $model['class'], $model['class_basename']]
-
-            ],
-            __DIR__ . '/../../resources/custom_translation/controller_translation.stub'
-        );
     }
 
     public static function addRoute($basenameModel)

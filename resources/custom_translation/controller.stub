@@ -123,10 +123,10 @@ class {controllerClass} extends Controller
         $form = new Form(new {basenameModelClass});
 
         $form->tab(__('admin.general'), function (Form $form) {
-{form}
+{baseForm}
         })->tab(__('admin.locales'), function(Form $form) {
             $form->hasMany('transes', function (Form\NestedForm $form) {
-{translation_form}
+{translationForm}
             });
         });
 

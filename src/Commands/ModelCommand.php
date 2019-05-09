@@ -67,7 +67,7 @@ class ModelCommand extends Command
     {
         MigrationService::create(
             $this->baseNameModelClass(),
-            MigrationService::generateMigrationFields($this->arrayFields()),
+            MigrationService::generateMigrationFields($this->collectionFields()->toArray()),
             $this->migrationStubPath(),
             $this->migrationReplacer()
         );
@@ -106,7 +106,7 @@ class ModelCommand extends Command
         return $this->option('fields');
     }
 
-    protected function arrayFields()
+    protected function collectionFields()
     {
         return FieldsService::parse($this->stringFields());
     }

@@ -29,12 +29,12 @@ class MigrationService
         file_put_contents($migrationPath, $content);
     }
 
-    public static function generateMigrationFields($fields)
+    public static function generateMigrationFields(Array $fields)
     {
         $output = '';
         $availableFieldTypes = include(__DIR__ . '/../../resources/fields/migration.php');
 
-        foreach ($fields->toArray() as $field) {
+        foreach ($fields as $field) {
 
             if (!in_array($field['type'], $availableFieldTypes)) {
                 throw new MigrationException('Not available field - ' . $field['type'] . '. ' . __FILE__ . ':' .

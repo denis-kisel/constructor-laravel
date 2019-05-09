@@ -4,7 +4,7 @@ namespace App\Admin\Controllers;
 
 use DenisKisel\ActiveHelper\ActiveHelper;
 use {modelClass};
-use {model}
+use {belongModelClass};
 use App\Http\Controllers\Controller;
 use DenisKisel\SmartImage\SmartImage;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -87,7 +87,7 @@ class {controllerClass} extends Controller
         $grid->model()->orderBy('created_at', 'desc');
 
         $grid->id(__('admin.id'));
-        $grid->{model_id}('{model_title}')->editable('select', {basename_model}::all()->pluck('name', 'id'));
+        $grid->{belongModelId}(__('admin.{belongModelLangKey}'))->editable('select', {belongBasenameModelClass}::all()->pluck('name', 'id'));
         $grid->locale(__('admin.locale'))->editable('select', Locale::all()->pluck('code', 'code'));
 {grid}
         $grid->created_at(__('admin.created_at'));
@@ -120,7 +120,7 @@ class {controllerClass} extends Controller
     protected function form()
     {
         $form = new Form(new {basenameModelClass});
-        $form->select('{model_id}', '{model_title}')->options({basename_model}::all()->pluck('name', 'id'));
+        $form->select('{model_id}', '{model_title}')->options({belongBasenameModelClass}::all()->pluck('name', 'id'));
         $form->select('locale', __('admin.locale'))->options(Locale::all()->pluck('code', 'code'));
 {form}
         return $form;

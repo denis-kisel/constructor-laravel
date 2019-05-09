@@ -6,6 +6,7 @@ namespace DenisKisel\Constructor\Commands;
 use DenisKisel\Constructor\Services\AdminService;
 use DenisKisel\Constructor\Services\FieldsService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class AdminTranslationCommand extends Command
 {
@@ -14,11 +15,11 @@ class AdminTranslationCommand extends Command
      * fields: field_name:data_type:length{migration_methods}
      * {type} - string|integer|text
      *
-     * Example: construct:admint App\\Models\\Page name:string[t],description:text{nullable}[t],image:string{nullable},is_active:boolean{nullable+default:1}
+     * Example: construct:admint App\\Models\\Page --fields=name:string[t],description:text{nullable}[t],image:string{nullable},is_active:boolean{nullable+default:1}
      *
      * @var string
      */
-    protected $signature = 'construct:admint {model} {fields} {--i}';
+    protected $signature = 'construct:admint {model} {--fields=} {--i}';
 
     /**
      * The console command description.
@@ -35,17 +36,37 @@ class AdminTranslationCommand extends Command
      */
     public function handle()
     {
-        $this->stopIfControllerExists();
-        $this->makeController();
-        $this->addRoute();
+        foreach ($this->models() as $model) {
+            $this->call('construct:admin', [
+                'model' => $model['class'],
+                '--fields' => $this->option('fields'),
+                '--i' => $this->option('i'),
+                '--controller_stub' => $model['controller_stub'],
+                '--controller_replacer' => json_encode($this->replacer())
+            ]);
+        }
     }
 
-    public function fields()
+    protected function models()
     {
-        return FieldsService::parse($this->argument('fields'));
+        return [
+            [
+                'class' => $this->argument('model'),
+                'controller_stub' => __DIR__ . '/../../resources/custom_translation/controller.stub',
+            ],
+            [
+                'class' => $this->translationModelClass(),
+                'controller_stub' => __DIR__ . '/../../resources/custom_translation/controller_translation.stub',
+            ]
+        ];
     }
 
-    protected function baseNameModelClass()
+    public function collectionFields()
+    {
+        return FieldsService::parse($this->option('fields'));
+    }
+
+    protected function basenameModelClass()
     {
         return class_basename($this->argument('model'));
     }
@@ -55,54 +76,18 @@ class AdminTranslationCommand extends Command
         return $this->argument('model') . 'Translation';
     }
 
-    protected function translationBaseModelClass()
-    {
-        return class_basename($this->translationModelClass());
-    }
-
-    protected function models()
+    protected function replacer()
     {
         return [
+            ['{baseForm}', '{translationForm}',  '{belongModelClass}','{belongBasenameModelClass}', '{belongModelId}', '{belongModelLangKey}'],
             [
-                'class' => $this->argument('model'),
-                'class_basename' => $this->baseNameModelClass(),
-                'template' => 'controller'
-            ],
-            [
-                'class' => $this->translationModelClass(),
-                'class_basename' => $this->translationBaseModelClass(),
-                'template' => 'controller_translation'
+                AdminService::generateForm($this->collectionFields()->where('is_translation', '=', false)->toArray()),
+                AdminService::generateForm($this->collectionFields()->where('is_translation', '=', true)->toArray(), 4),
+                $this->argument('model'),
+                $this->basenameModelClass(),
+                Str::snake($this->basenameModelClass()) . '_id',
+                Str::snake($this->basenameModelClass())
             ]
         ];
-    }
-
-    protected function makeController()
-    {
-        AdminService::makeControllerTranslation(collect($this->models()), $this->fields());
-        $this->info("Admin {$this->baseNameModelClass()}Controller is created!");
-    }
-
-    protected function addRoute()
-    {
-        foreach ($this->models() as $model) {
-            $this->info(AdminService::addRoute(class_basename($model['class'])));
-        }
-    }
-
-    protected function stopIfControllerExists()
-    {
-        if ($this->option('i')) {
-            return;
-        }
-
-        if (class_exists('App\\Admin\\Controllers\\' . $this->baseNameModelClass() . 'Controller')) {
-            $this->warn("This admin {$this->baseNameModelClass()}Controller is already exists!");
-            die();
-        }
-
-        if (class_exists('App\\Admin\\Controllers\\' . $this->baseNameModelClass() . 'TranslationController')) {
-            $this->warn("This admin {$this->baseNameModelClass()}TranslationController is already exists!");
-            die();
-        }
     }
 }

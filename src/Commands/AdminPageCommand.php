@@ -25,7 +25,7 @@ class AdminPageCommand extends Command
         $this->addRoute();
     }
 
-    public function fields()
+    public function collectionFields()
     {
         return FieldsService::parse($this->option('fields'));
     }
@@ -39,8 +39,8 @@ class AdminPageCommand extends Command
     {
         AdminService::makeController(
             $this->argument('model'),
-            AdminService::generateForm($this->fields()),
-            AdminService::generateGrid($this->fields()),
+            $this->collectionFields()->toArray(),
+            $this->collectionFields()->toArray(),
             null,
             __DIR__ . '/../../resources/page/admin_controller.stub'
         );

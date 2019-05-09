@@ -88,7 +88,7 @@ class PageCommand extends Command
                     Str::plural($this->basenameClassName()),
                     Str::plural(Str::snake($this->basenameClassName())),
                     MigrationService::generateMigrationFields(
-                        FieldsService::parse($this->option('fields')), false, null, false, false
+                        $this->collectionFields()->toArray(), false, null, false, false
                     )
                 ]
             ]
@@ -105,5 +105,10 @@ class PageCommand extends Command
                 '--fields' => $this->option('fields')
             ]);
         }
+    }
+
+    protected function collectionFields()
+    {
+        return FieldsService::parse($this->option('fields'));
     }
 }

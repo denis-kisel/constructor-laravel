@@ -57,7 +57,7 @@ class AdminCommand extends Command
     {
         AdminService::makeController(
             $this->argument('model'),
-            $this->arrayFields(),
+            $this->collectionFields()->toArray(),
             $this->stubPath(),
             $this->replacer()
         );
@@ -77,7 +77,7 @@ class AdminCommand extends Command
         return $this->option('fields');
     }
 
-    public function arrayFields()
+    public function collectionFields()
     {
         return FieldsService::parse($this->stringFields());
     }
@@ -95,7 +95,7 @@ class AdminCommand extends Command
     public function replacer() {
         $output = null;
         if ($this->option('controller_replacer')) {
-            $output = $this->option('controller_replacer');
+            $output = json_decode($this->option('controller_replacer'));
         }
 
         return $output;
