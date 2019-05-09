@@ -18,7 +18,7 @@ class AdminCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'construct:admin {model} {fields} {--i}';
+    protected $signature = 'construct:admin {model} {--fields=} {--i} {--controller_stub=} {--controller_replacer=}';
 
     /**
      * The console command description.
@@ -26,6 +26,7 @@ class AdminCommand extends Command
      * @var string
      */
     protected $description = 'Construct admin from model';
+    protected $controllerStubPath = __DIR__ . '/../../resources/custom/admin_controller.stub';
 
 
     /**
@@ -40,22 +41,25 @@ class AdminCommand extends Command
         $this->addRoute();
     }
 
-    public function fields()
+    //STACK
+    protected function stopIfControllerExists()
     {
-        return FieldsService::parse($this->argument('fields'));
-    }
-
-    protected function baseNameModelClass()
-    {
-        return class_basename($this->argument('model'));
+        if ($this->option('i')) {
+            return;
+        }
+        if (class_exists('App\\Admin\\Controllers\\' . $this->baseNameModelClass() . 'Controller')) {
+            $this->warn("This admin {$this->baseNameModelClass()}Controller is already exists!");
+            die();
+        }
     }
 
     protected function makeController()
     {
         AdminService::makeController(
             $this->argument('model'),
-            AdminService::generateForm($this->fields()),
-            AdminService::generateGrid($this->fields())
+            $this->arrayFields(),
+            $this->stubPath(),
+            $this->replacer()
         );
 
         $this->info("Admin {$this->baseNameModelClass()}Controller is created!");
@@ -66,14 +70,39 @@ class AdminCommand extends Command
         $this->info(AdminService::addRoute($this->baseNameModelClass()));
     }
 
-    protected function stopIfControllerExists()
+
+    //HELPERS
+    public function stringFields()
     {
-        if ($this->option('i')) {
-            return;
+        return $this->option('fields');
+    }
+
+    public function arrayFields()
+    {
+        return FieldsService::parse($this->stringFields());
+    }
+
+    public function stubPath()
+    {
+        $output = $this->controllerStubPath;
+        if ($this->option('controller_stub')) {
+            $output = $this->option('controller_stub');
         }
-        if (class_exists('App\\Admin\\Controllers\\' . $this->baseNameModelClass() . 'Controller')) {
-            $this->warn("This admin {$this->baseNameModelClass()}Controller is already exists!");
-            die();
+
+        return $output;
+    }
+
+    public function replacer() {
+        $output = null;
+        if ($this->option('controller_replacer')) {
+            $output = $this->option('controller_replacer');
         }
+
+        return $output;
+    }
+
+    protected function baseNameModelClass()
+    {
+        return class_basename($this->argument('model'));
     }
 }

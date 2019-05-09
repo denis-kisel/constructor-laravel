@@ -49,10 +49,10 @@ EOF;
         return $output;
     }
 
-    public static function makeController($modelClass, $form, $grid, $replaces = null, $stub = null)
+    public static function makeController($modelClass, $arrayFields, $stub = null, $replaces = null)
     {
         $basenameModelClass = class_basename($modelClass);
-        $controllerStubPath = (is_null($stub)) ? self::$adminControllerStub : $stub;
+        $controllerStubPath = $stub;
         $newControllerPath = app_path("Admin/Controllers/{$basenameModelClass}Controller.php");
         copy($controllerStubPath, $newControllerPath);
 
@@ -65,8 +65,8 @@ EOF;
         $content = str_replace('{controllerClass}', "{$basenameModelClass}Controller", $content);
         $content = str_replace('{modelClass}', "{$modelClass}", $content);
         $content = str_replace('{title}', $title, $content);
-        $content = str_replace('{form}', $form, $content);
-        $content = str_replace('{grid}', $grid, $content);
+        $content = str_replace('{form}', self::generateForm($arrayFields), $content);
+        $content = str_replace('{grid}', self::generateGrid($arrayFields), $content);
 
         if (!is_null($replaces)) {
             $content = str_replace($replaces[0], $replaces[1], $content);

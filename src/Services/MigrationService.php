@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class MigrationService
 {
-    public static function create($basenameModelName, $stub, $replacer = [])
+    public static function create($basenameModelName, $arrayFields, $stub, $replacer = [])
     {
         $table = Str::plural(Str::snake($basenameModelName));
         $migrationPath = database_path('migrations/' . date('Y_m_d_His') . "_create_{$table}_table.php");
@@ -20,6 +20,7 @@ class MigrationService
         $class = Str::studly($table);
         $content = str_replace('{class}', "Create{$class}Table", $content);
         $content = str_replace('{table}', $table, $content);
+        $content = str_replace('{fields}', self::generateMigrationFields($arrayFields), $content);
 
         if ($replacer) {
             $content = str_replace($replacer[0], $replacer[1], $content);

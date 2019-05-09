@@ -68,6 +68,7 @@ class ModelCommand extends Command
     {
         MigrationService::create(
             $this->baseNameModelClass(),
+            $this->arrayFields(),
             $this->stubPath(),
             $this->replacer()
         );
@@ -126,10 +127,5 @@ class ModelCommand extends Command
         if ($this->option('mig_replacer')) {
             return json_decode($this->option('mig_replacer'));
         }
-
-        return  [
-            '{fields}',
-            MigrationService::generateMigrationFields($this->arrayFields())
-        ];
     }
 }

@@ -30,7 +30,9 @@ class InstallLocaleCommand extends Command
 
     protected function callAdmin()
     {
-
+        if ($this->option('a')) {
+            $this->call('install:admin_locale');
+        }
     }
 
     //HELPER
