@@ -1,0 +1,13 @@
+<?php
+
+namespace {namespace};
+
+use Illuminate\Database\Eloquent\Model;
+
+
+class {class} extends Model
+{
+    protected $fillable = [
+        'locale', {fillable}
+    ];
+}

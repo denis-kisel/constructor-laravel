@@ -60,6 +60,7 @@ class ModelCommand extends Command
     protected function makeModel()
     {
         ModelService::create($this->nameModelClass(), $this->modelStubPath(), $this->modelReplacer());
+        $this->info("Model {$this->nameModelClass()} is created!");
     }
 
     protected function makeMigration()

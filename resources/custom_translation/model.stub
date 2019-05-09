@@ -1,0 +1,24 @@
+<?php
+
+namespace {namespace};
+
+use Dimsav\Translatable\Translatable;
+use Illuminate\Database\Eloquent\Model;
+
+class {class} extends Model
+{
+    use Translatable;
+
+    public $fillable = [
+        'locale', {fillable}
+    ];
+
+    public $translatedAttributes = [
+        'locale', {fillable}
+    ];
+
+    public function transes()
+    {
+        return $this->hasMany({translation_model}::class);
+    }
+}

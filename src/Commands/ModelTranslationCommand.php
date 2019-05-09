@@ -16,7 +16,7 @@ class ModelTranslationCommand extends Command
      * fields: field_name:data_type:length{migration_methods}
      * {type} - string|integer|text
      *
-     * Example: construct:modelt App\\Models\\Page name:string[t],description:text{nullable}[t],is_active:boolean{nullable+default:1}
+     * Example: construct:modelt App\\Models\\Page --fields=name:string[t],description:text{nullable}[t],is_active:boolean{nullable+default:1}
      *
      * @var string
      */
@@ -38,7 +38,6 @@ class ModelTranslationCommand extends Command
     public function handle()
     {
         $this->callModels();
-        $this->bindModels();
         $this->callAdmins();
     }
 
@@ -51,34 +50,13 @@ class ModelTranslationCommand extends Command
                 '--fields' => $this->getStringFieldsByType($model['template'] == 'translation_model'),
                 '--i' => $this->option('i'),
                 '--m' => $this->option('m'),
-                '--mig_stub' => $model['stub'],
-                '--mig_replacer' => json_encode($this->replacer())
+                '--mig_stub' => $model['mig_stub'],
+                '--mig_replacer' => json_encode($this->migrationReplacer()),
+                '--model_stub' => $model['model_stub'],
+                '--model_replacer' => json_encode($this->modelReplacer())
             ]);
             sleep(1);
         }
-    }
-
-    protected function bindModels()
-    {
-        //MODEL
-        $pathModelClass = AStr::pathByClass($this->argument('model'));
-        $contents = file_get_contents($pathModelClass);
-        $contents = AStr::append(
-            'use Illuminate\Database\Eloquent\Model;',
-            'use Dimsav\Translatable\Translatable;',
-            $contents
-        );
-
-        $contents = AStr::prepend('}', 'use Translatable;', $contents, 1);
-        $contents = AStr::prepend('}', ModelService::generateTranslationAttributes($this->arrayFields()), $contents, 1);
-        $contents = AStr::prepend('}', ModelService::generateTransesMethod($this->translationBaseModelClass()), $contents);
-        file_put_contents($pathModelClass, $contents);
-
-        //TRANSLATION MODEL
-        $pathTranslationModelClass = AStr::pathByClass($this->translationModelClass());
-        $contents = file_get_contents($pathTranslationModelClass);
-        $contents = AStr::prepend('}', ModelService::generateTranslationFillable($this->arrayFields()), $contents, 1);
-        file_put_contents($pathTranslationModelClass, $contents);
     }
 
     protected function callAdmins()
@@ -100,13 +78,15 @@ class ModelTranslationCommand extends Command
                 'class' => $this->argument('model'),
                 'basename_class' => $this->baseNameModelClass(),
                 'template' => 'model',
-                'stub' => __DIR__ . '/../../resources/custom/migration.stub'
+                'mig_stub' => __DIR__ . '/../../resources/custom/migration.stub',
+                'model_stub' => __DIR__ . '/../../resources/custom_translation/model.stub',
             ],
             [
                 'class' => $this->translationModelClass(),
                 'basename_class' => $this->translationBaseModelClass(),
                 'template' => 'translation_model',
-                'stub' => __DIR__ . '/../../resources/custom_translation/migration.stub'
+                'mig_stub' => __DIR__ . '/../../resources/custom_translation/migration.stub',
+                'model_stub' => __DIR__ . '/../../resources/custom_translation/model_translation.stub',
             ]
         ];
     }
@@ -131,7 +111,7 @@ class ModelTranslationCommand extends Command
         return $this->option('fields');
     }
 
-    protected function arrayFields()
+    protected function collectionFields()
     {
         return FieldsService::parse($this->stringFields());
     }
@@ -153,11 +133,28 @@ class ModelTranslationCommand extends Command
         return implode(',', $output);
     }
 
-    protected function replacer()
+    protected function migrationReplacer()
     {
         return [
             '{belong_table_id}',
             Str::snake($this->baseNameModelClass()) . '_id'
+        ];
+    }
+
+    protected function modelReplacer()
+    {
+        $fields = $this->collectionFields()->where('is_translation', '=', true)->toArray();
+        $fieldsNames = [];
+        foreach ($fields as $field) {
+            $fieldsNames[] = '\'' . $field['name'] . '\'';
+        }
+
+        return [
+            ['{fillable}', '{translation_model}'],
+            [
+                implode(', ', $fieldsNames),
+                $this->translationBaseModelClass()
+            ]
         ];
     }
 }
