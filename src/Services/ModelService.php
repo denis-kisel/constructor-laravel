@@ -4,8 +4,6 @@
 namespace DenisKisel\Constructor\Services;
 
 
-use DenisKisel\Helper\AStr;
-
 class ModelService
 {
     public static function create($modelClass, $stub, $replacer = null)

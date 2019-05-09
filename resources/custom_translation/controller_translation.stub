@@ -120,7 +120,7 @@ class {controllerClass} extends Controller
     protected function form()
     {
         $form = new Form(new {basenameModelClass});
-        $form->select('{model_id}', '{model_title}')->options({belongBasenameModelClass}::all()->pluck('name', 'id'));
+        $form->select('{belongModelId}', __('admin.{belongModelLangKey}'))->options({belongBasenameModelClass}::all()->pluck('name', 'id'));
         $form->select('locale', __('admin.locale'))->options(Locale::all()->pluck('code', 'code'));
 {form}
         return $form;

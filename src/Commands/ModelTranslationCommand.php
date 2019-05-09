@@ -91,7 +91,7 @@ class ModelTranslationCommand extends Command
             return $this->option('model_stub');
         }
         return [
-            'm' => __DIR__ . __DIR__ . '/../../resources/custom_translation/model.stub',
+            'm' => __DIR__ . '/../../resources/custom_translation/model.stub',
             'mt' => __DIR__ . '/../../resources/custom_translation/model_translation.stub',
         ];
     }
@@ -102,7 +102,7 @@ class ModelTranslationCommand extends Command
             return $this->option('mig_replacer');
         }
         return json_encode([
-            '{belong_table_id}',
+            '{belongTableId}',
             Str::snake($this->baseNameModelClass()) . '_id'
         ]);
     }

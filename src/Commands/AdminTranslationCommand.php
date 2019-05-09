@@ -13,7 +13,7 @@ class AdminTranslationCommand extends Command
     /**
      * Example: construct:admint App\\Models\\Page --fields=name:string[t],description:text{nullable}[t],image:string{nullable},is_active:boolean{nullable+default:1}
      */
-    protected $signature = 'construct:admint {model} {--fields=} {--i}';
+    protected $signature = 'construct:admint {model} {--fields=} {--i} {--controller_stub=} {--controller_replacer=}';
     protected $description = 'Construct admin translation from model';
 
 
@@ -68,7 +68,7 @@ class AdminTranslationCommand extends Command
         return json_encode([
             ['{baseForm}', '{translationForm}',  '{belongModelClass}','{belongBasenameModelClass}', '{belongModelId}', '{belongModelLangKey}'],
             [
-                AdminService::generateForm($this->collectionFields()->where('is_translation', '=', false)->toArray()),
+                AdminService::generateForm($this->collectionFields()->where('is_translation', '=', false)->toArray(), 3),
                 AdminService::generateForm($this->collectionFields()->where('is_translation', '=', true)->toArray(), 4),
                 $this->argument('model'),
                 $this->basenameModelClass(),

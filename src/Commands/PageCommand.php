@@ -3,10 +3,8 @@
 
 namespace DenisKisel\Constructor\Commands;
 
-use DenisKisel\Constructor\Services\FieldsService;
-use DenisKisel\Constructor\Services\MigrationService;
+
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 
 class PageCommand extends Command
 {

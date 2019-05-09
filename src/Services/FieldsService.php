@@ -38,7 +38,7 @@ class FieldsService
                 $nameAndType = explode(':', $fieldForParse);
 
                 if (count($nameAndType) < 2) {
-                    throw new CustomTranslationCommandException('Wrong field: ' . $fieldForParse . '. Right pattern: name:type:length[null]');
+                    throw new CustomTranslationCommandException('Wrong field: ' . $fieldForParse . '. Right pattern: name:type:length{migration_fields}[t]');
                 }
 
                 $fields[] = [

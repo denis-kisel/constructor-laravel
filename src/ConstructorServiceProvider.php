@@ -13,6 +13,7 @@ use DenisKisel\Constructor\Commands\InstallLocaleCommand;
 use DenisKisel\Constructor\Commands\ModelCommand;
 use DenisKisel\Constructor\Commands\ModelTranslationCommand;
 use DenisKisel\Constructor\Commands\PageCommand;
+use DenisKisel\Constructor\Commands\PageTranslationCommand;
 use Illuminate\Support\ServiceProvider;
 
 class ConstructorServiceProvider extends ServiceProvider
@@ -96,6 +97,7 @@ class ConstructorServiceProvider extends ServiceProvider
         // Registering package commands.
          $this->commands([
              PageCommand::class,
+             PageTranslationCommand::class,
              AdminPageCommand::class,
              CategoryProductCommand::class,
              ModelCommand::class,

@@ -24,7 +24,6 @@ class {class} extends Migration
             $table->text('keywords')->nullable();
             $table->text('meta_description')->nullable();
 {fields}
-            $table->boolean('is_active')->default(1);
             $table->timestamps();
         });
     }
