@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class PageTranslationCommand extends Command
 {
-    protected $signature = 'construct:paget {model} {--fields=} {--a} {--i}';
+    protected $signature = 'construct:paget {model} {--fields=} {--a} {--i} {--m}';
     protected $description = 'Constructor of page translation';
 
 
@@ -25,6 +25,7 @@ class PageTranslationCommand extends Command
             'model' => $this->argument('model'),
             '--fields' => $this->fields(),
             '--i' => $this->option('i'),
+            '--m' => $this->option('m')
         ]);
     }
 

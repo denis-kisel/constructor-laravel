@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class PageCommand extends Command
 {
-    protected $signature = 'construct:page {model} {--fields=} {--a} {--i}';
+    protected $signature = 'construct:page {model} {--fields=} {--a} {--i} {--m}';
     protected $description = 'Constructor of page';
 
 
@@ -24,6 +24,7 @@ class PageCommand extends Command
             'model' => $this->argument('model'),
             '--fields' => $this->fields(),
             '--i' => $this->option('i'),
+            '--m' => $this->option('m')
         ]);
     }
 
