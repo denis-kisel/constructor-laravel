@@ -14,6 +14,58 @@ Via Composer
 $ composer require denis-kisel/constructor
 ```
 
+## Docs
+### Available admin commands
+| Command | Description |
+| --- | --- |
+| `construct:admin {model} {--fields=} {--i}` | Construct laravel-admin controller |
+| `construct:admint {model} {--fields=} {--i}` | Construct laravel-admin controller with bind to locale(translation) |
+| `construct:admin_page {model} {--fields=} {--i}` | Construct laravel-admin controller with basic page fields |
+
+### Available install commands
+| Command | Description |
+| --- | --- |
+| `install:locale {--m} {--i} {--a}` | Install locale model with optional install controller for laravel-admin |
+| `install:admin_locale` | Install locale controller for laravel-admin |
+
+### Available model commands
+| Command | Description |
+| --- | --- |
+| `construct:model {model} {--fields=} {--i} {--m} {--a}` | Construct model |
+| `construct:modelt {model} {--fields=} {--i} {--m} {--a}` | Construct model with bind to locale(translation) |
+| `construct:page {model} {--fields=} {--a} {--i} {--m}` | Construct model with basic page fields |
+| `construct:paget {model} {--fields=} {--a} {--i} {--m}` | Construct model with basic page fields with bind to locale(translation) |
+
+### Options
+| Option | Description |
+| --- | --- |
+| `{model}` | Model name. Must be with *namespace* |
+| `{--fields=}` | Custom fields by pattern: *name:data_type:length{migration_methods}\[t\]*. Separate by `,` |
+| `{--i}` | Ignore exists model or controller |
+| `{--m}` | Make model and migration with `migrate` command |
+| `{--a}` | Construct laravel-admin controller |
+
+
+### Fields pattern
+*name:data_type:length{migration_methods}\[t\]*
+
+| Option | Description |
+| --- | --- |
+| `name` | Column name |
+| `data_type` | Data type of DB(`string`, `text`, `json` ... ) |
+| `length` | Column field length. Optional param |
+| `{migration_methods}` | Migration methods by pattern *{method_name:method_param}*. Separate by `+`. Optional param |
+| `[t]` | Mark field as translation(for bind to locale). Optional param |
+
+
+### Migration methods pattern
+*{method_name:method_param}*
+
+| Option | Description |
+| --- | --- |
+| `method_name` | Method name. Exp: nullable -> nullable() |
+| `method_param` | Method value. Exp: default:1 -> default(1) |
+
 ## Usage
 
 Create new model
@@ -117,14 +169,3 @@ $ php artisan construct:page App\\Models\\Page --fields=additional_description:t
 # Also available generate typical translation page
 $ php artisan construct:paget App\\Models\\Page --fields=additional_description:text{nullable}[t]
 ```
-
-## Available commands
-* construct:admin {model} {--fields=} {--i}
-* construct:admin_page {model} {--fields=}
-* construct:admint {model} {--fields=} {--i}
-* install:admin_locale
-* install:locale {--m} {--i} {--a}
-* construct:model {model} {--fields=} {--i} {--m} {--a}
-* construct:modelt {model} {--fields=} {--i} {--m} {--a}
-* construct:page {model} {--fields=} {--a} {--i} {--m}
-* construct:paget {model} {--fields=} {--a} {--i} {--m}
