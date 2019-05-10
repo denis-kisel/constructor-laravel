@@ -71,7 +71,7 @@ class {controllerClass} extends Controller
     {
         return $content
             ->header(__('admin.create'))
-            ->description('description')
+            ->description(' ')
             ->body($this->form());
     }
 

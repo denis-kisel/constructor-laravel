@@ -15,11 +15,32 @@ class AdminService
         $output = '';
         $availableAdminFieldTypes = include(__DIR__ . '/../../resources/fields/laravel_admin.php');
         foreach ($fields as $field) {
-            if (in_array('nullable', Arr::flatten($field), true)) {
-                $output .= AStr::formatText("\$form->{$availableAdminFieldTypes[$field['type']]}('{$field['name']}', __('admin.{$field['name']}'));", $countTabs);
-            } else {
-                $output .= AStr::formatText("\$form->{$availableAdminFieldTypes[$field['type']]}('{$field['name']}', __('admin.{$field['name']}'))->required();", $countTabs);
+            $methods = self::makeFormFieldMethods($field);
+            $fieldType = (!empty($availableAdminFieldTypes[$field['name']])) ? $availableAdminFieldTypes[$field['name']] : $availableAdminFieldTypes[$field['type']];
+            $output .= AStr::formatText("\$form->{$fieldType}('{$field['name']}', __('admin.{$field['name']}')){$methods};", $countTabs);
+        }
+
+        return $output;
+    }
+
+    public static function makeFormFieldMethods($field)
+    {
+        $output = '';
+
+        if ($field['name'] == 'h1') {
+            $output .= '->attribute([\'style\' => \'margin:0\'])';
+        }
+
+        if (!empty($field['migration_methods'])) {
+            foreach ($field['migration_methods'] as $migration_method) {
+                if ($migration_method['name'] == 'default') {
+                    $output .= "->default('{$migration_method['value']}')";
+                }
             }
+        }
+
+        if (!in_array('nullable', Arr::flatten($field), true)) {
+            $output .= "->required()";
         }
 
         return $output;

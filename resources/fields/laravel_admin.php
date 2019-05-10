@@ -22,7 +22,7 @@ return [
     'smallIncrements' => 'number',
     'smallInteger' => 'number',
     'string' => 'text',
-    'text' => 'summernote',
+    'text' => 'textarea',
     'time' => 'time',
     'timeTz' => 'time',
     'timestamp' => 'text',
@@ -36,4 +36,9 @@ return [
     'unsignedTinyInteger' => 'number',
     'uuid' => 'text',
     'year' => 'text',
+
+    'keywords' => 'tags',
+    'description' => 'summernote',
+    'image' => 'image',
+    'icon' => 'image',
 ];

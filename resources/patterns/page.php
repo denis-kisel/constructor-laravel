@@ -1,6 +1,7 @@
 <?php
 $output = [
     'code:string{nullable}[t]',
+    'slug:string{nullable}[t]',
     'name:string[t]',
     'description:text{nullable}[t]',
     'title:string{nullable}[t]',
