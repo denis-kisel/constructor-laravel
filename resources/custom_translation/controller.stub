@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use DenisKisel\ActiveHelper\ActiveHelper;
+use App\Models\Locale;
 use {modelClass};
 use App\Http\Controllers\Controller;
 use DenisKisel\SmartImage\SmartImage;
@@ -126,6 +127,7 @@ class {controllerClass} extends Controller
 {baseForm}
         })->tab(__('admin.locales'), function(Form $form) {
             $form->hasMany('transes', function (Form\NestedForm $form) {
+                $form->select('locale')->options(Locale::all()->pluck('name', 'code'));
 {translationForm}
             });
         });

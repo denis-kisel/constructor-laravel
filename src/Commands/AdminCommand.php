@@ -39,6 +39,7 @@ class AdminCommand extends Command
         $this->stopIfControllerExists();
         $this->makeController();
         $this->addRoute();
+        $this->addLang();
     }
 
     //STACK
@@ -68,6 +69,11 @@ class AdminCommand extends Command
     protected function addRoute()
     {
         $this->info(AdminService::addRoute($this->baseNameModelClass()));
+    }
+
+    protected function addLang()
+    {
+        $this->info(AdminService::addLang($this->collectionFields()->toArray()));
     }
 
 

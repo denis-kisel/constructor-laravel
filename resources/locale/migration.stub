@@ -17,6 +17,7 @@ class CreateLocalesTable extends Migration
             $table->bigIncrements('id');
             $table->string('code');
             $table->string('name');
+            $table->integer('sort')->default(0);
             $table->boolean('is_active')->default(1);
             $table->timestamps();
         });

@@ -117,4 +117,37 @@ EOF;
 
         return $output;
     }
+
+    public static function addLang(Array $fields)
+    {
+        if (!$fields) {
+            return;
+        }
+
+        if (!file_exists(resource_path('lang/en/admin.php'))) {
+            mkdir(resource_path('lang/en'));
+            copy(__DIR__ . '/../../resources/admin/lang.stub', resource_path('lang/en/admin.php'));
+        }
+
+        $contentLang = file_get_contents(resource_path('lang/en/admin.php'));
+
+        $langArray = include(resource_path('lang/en/admin.php'));
+        $langCollection = collect($langArray);
+        $adminKeys = $langCollection->keys()->toArray();
+
+        $output = '';
+        foreach ($fields as $field) {
+            if (!in_array($field['name'], $adminKeys)) {
+                $value = Str::title($field['name']);
+                $el = "'{$field['name']}' => '{$value}',";
+                $contentLang = AStr::prepend('];', $el, $contentLang, 1);
+
+                $output .= "Lang: added new key - {$field['name']}" . PHP_EOL;
+            }
+        }
+
+        file_put_contents(resource_path('lang/en/admin.php'), $contentLang);
+
+        return $output;
+    }
 }
