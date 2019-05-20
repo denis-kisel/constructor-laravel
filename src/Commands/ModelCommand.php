@@ -22,7 +22,7 @@ class ModelCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'construct:model {model} {--fields=} {--i} {--m} {--a} {--mig_stub=} {--mig_replacer=} {--model_stub} {--model_replacer}';
+    protected $signature = 'construct:model {model} {--fields=} {--pattern_path=} {--i} {--m} {--a} {--mig_stub=} {--mig_replacer=} {--model_stub} {--model_replacer}';
 
     /**
      * The console command description.
@@ -88,7 +88,7 @@ class ModelCommand extends Command
         if ($this->option('a')) {
             $this->call('construct:admin', [
                 'model' => $this->nameModelClass(),
-                'fields' => $this->stringFields(),
+                '--fields' => $this->stringFields(),
                 '--i' => ($this->option('i')) ? '--i' : null,
             ]);
         }
@@ -107,7 +107,15 @@ class ModelCommand extends Command
 
     protected function stringFields()
     {
-        return $this->option('fields');
+        $fields = [];
+        if ($this->option('fields')) {
+            $fields[] = $this->option('fields');
+        }
+        if ($this->option('pattern_path')) {
+            $fields[] = include base_path($this->option('pattern_path'));
+        }
+
+        return implode(',', $fields);
     }
 
     protected function collectionFields()

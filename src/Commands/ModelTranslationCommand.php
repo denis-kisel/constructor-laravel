@@ -47,7 +47,7 @@ class ModelTranslationCommand extends Command
         if ($this->option('a')) {
             $this->call('construct:admint', [
                 'model' => $this->argument('model'),
-                'fields' => $this->stringFields(),
+                '--fields' => $this->stringFields(),
                 '--i' => $this->option('i')
             ]);
         }
