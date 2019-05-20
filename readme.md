@@ -18,10 +18,6 @@ $ composer require denis-kisel/constructor
 #####  Create simple model with migration
 ``` bash
 $ construct:model App\\Models\\Post --fields=name:string:50,description:text{nullable},sort:integer{default:0},is_active:boolean{default:1}
-
-# Output
-# Created Post model: proj/app/Models/Post.php
-# Created Post model migration with contents
 ```
 #####  Output
 * Created Post model: *proj/app/Models/Post.php*
@@ -46,10 +42,6 @@ Schema::create('posts', function (Blueprint $table) {
 #####  Create simple model with migration and laravel-admin controller
 ``` bash
 $ construct:model App\\Models\\Post --fields=name:string:50,description:text{nullable},sort:integer{default:0},is_active:boolean{default:1} --a
-
-# Output
-# Created Post model: proj/app/Models/Post.php
-# Created Post model migration with contents
 ```
 #####  Output
 * Created Post model: *proj/app/Models/Post.php*
