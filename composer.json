@@ -11,11 +11,11 @@
     "homepage": "https://github.com/denis-kisel/constructor-laravel",
     "keywords": ["Laravel", "Constructor"],
     "require": {
-        "illuminate/support": "~5",
+        "illuminate/support": "5.*",
         "denis-kisel/active-helper" : "^1.0",
         "denis-kisel/smart-image" : "^1.1",
         "denis-kisel/helper": "1.*",
-        "dimsav/laravel-translatable": "8.*"
+        "dimsav/laravel-translatable": "*"
     },
     "autoload": {
         "psr-4": {
