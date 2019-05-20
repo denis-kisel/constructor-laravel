@@ -14,7 +14,7 @@ Via Composer
 $ composer require denis-kisel/constructor
 ```
 
-##Demo
+## Demo
 #####  Create simple model with migration
 ``` bash
 $ construct:model App\\Models\\Post --fields=name:string:50,description:text{nullable},sort:integer{default:0},is_active:boolean{default:1}
