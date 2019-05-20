@@ -22,8 +22,13 @@ $ construct:model App\\Models\\Post --fields=name:string:50,description:text{nul
 # Output
 # Created Post model: proj/app/Models/Post.php
 # Created Post model migration with contents
-
+```
+#####  Output
+* Created Post model: *proj/app/Models/Post.php*
+* Created Post model migration with contents:
+```php
 <?php
+
 ...
 
 Schema::create('posts', function (Blueprint $table) {
@@ -45,26 +50,15 @@ $ construct:model App\\Models\\Post --fields=name:string:50,description:text{nul
 # Output
 # Created Post model: proj/app/Models/Post.php
 # Created Post model migration with contents
-
+```
+#####  Output
+* Created Post model: *proj/app/Models/Post.php*
+* Created Post model migration with contents(example above)
+* Created new resources route of laravel-admin: *admin/posts*
+* Created PostController of laravel-admin: *proj/app/Admin/Controllers/PostController.php* with contents:
+```php
 <?php
-...
 
-Schema::create('posts', function (Blueprint $table) {
-    $table->bigIncrements('id');
-    $table->string('name', 50);
-    $table->text('description')->nullable();
-    $table->integer('sort')->default(0);
-    $table->boolean('is_active')->default(1);
-    $table->timestamps();
-});
-
-...
-
-
-# Created new resources route of laravel-admin: admin/posts
-# Created PostController of laravel-admin: proj/app/Admin/Controllers/PostController.php with contents:
-
-<?php
 ...
 
 protected function grid()
