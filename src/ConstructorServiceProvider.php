@@ -14,6 +14,7 @@ use DenisKisel\Constructor\Commands\ModelCommand;
 use DenisKisel\Constructor\Commands\ModelTranslationCommand;
 use DenisKisel\Constructor\Commands\PageCommand;
 use DenisKisel\Constructor\Commands\PageTranslationCommand;
+use DenisKisel\Constructor\Commands\PaymentCommand;
 use Illuminate\Support\ServiceProvider;
 
 class ConstructorServiceProvider extends ServiceProvider
@@ -106,6 +107,7 @@ class ConstructorServiceProvider extends ServiceProvider
              AdminTranslationCommand::class,
              InstallLocaleCommand::class,
              InstallAdminLocaleCommand::class,
+             PaymentCommand::class,
          ]);
     }
 }

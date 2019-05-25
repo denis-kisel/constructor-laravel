@@ -102,7 +102,7 @@ protected function form()
 ### Available install commands
 | Command | Description |
 | --- | --- |
-| `install:locale {--m} {--i} {--a}` | Install locale model with optional install controller for laravel-admin |
+| `install:locale {--m} {--i} {--a}` | Install locale model `App\Models\Locale` with optional install controller for laravel-admin with fields: `code`, `name`, `sort`, `is_active` |
 | `install:admin_locale` | Install locale controller for laravel-admin |
 
 
@@ -111,8 +111,9 @@ protected function form()
 | --- | --- |
 | `construct:model {model} {--fields=} {--i} {--m} {--a}` | Construct model |
 | `construct:modelt {model} {--fields=} {--i} {--m} {--a}` | Construct model with bind to locale(translation) |
-| `construct:page {model} {--fields=} {--a} {--i} {--m}` | Construct model with basic page fields |
+| `construct:page {model} {--fields=} {--a} {--i} {--m}` | Construct model with basic page fields: `code`, `slug`, `name`, `description`, `title`, `h1`, `keywords`, `meta_description`, `sort`, `is_active` |
 | `construct:paget {model} {--fields=} {--a} {--i} {--m}` | Construct model with basic page fields with bind to locale(translation) |
+| `construct:payment {--model=} {--a} {--i} {--m}` | Construct payment model. By default `App\Models\Payment`.Fields: `code`, `name`, `image`, `description`, `sort`, `is_active`|
 
 
 ### Options
