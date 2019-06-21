@@ -27,6 +27,7 @@ $ composer require denis-kisel/constructor
 | --- | --- |
 | `install:locale {--m} {--i} {--a}` | Install locale model with optional install controller for laravel-admin |
 | `install:admin_locale` | Install locale controller for laravel-admin |
+| `install:construct_image` | Public image config and placeholder |
 
 ### Available model commands
 | Command | Description |

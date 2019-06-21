@@ -21,6 +21,8 @@ trait ImageSrcTrait
             }
         }
 
-        return SmartImage::cache($this->image, $sizes[0], $sizes[1]);
+        $image = (empty($this->image)) ? config('image.placeholder') : $this->image;
+
+        return SmartImage::cache($image, $sizes[0], $sizes[1]);
     }
 }

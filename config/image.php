@@ -1,9 +1,16 @@
 <?php
 
 return [
+    /*
+    |
+    | From storage/app/public folder
+    |
+    */
+    'placeholder' => 'placeholder.png',
+
     'sizes' => [
-        'preview' => [600, 400],
-        'thumb' => [400, 400],
-        'original' => [null, null]
+        'original' => [null, null],
+        'icon' => [50, 50],
+        'preview' => [500, 500],
     ]
 ];
