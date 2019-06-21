@@ -108,11 +108,8 @@ class ConstructorServiceProvider extends ServiceProvider
              AdminTranslationCommand::class,
              InstallLocaleCommand::class,
              InstallAdminLocaleCommand::class,
-<<<<<<< HEAD
              InstallImageCommand::class,
-=======
              PaymentCommand::class,
->>>>>>> c79c413dd29e55d5eeedec22f269b696d05b5f8e
          ]);
     }
 }
