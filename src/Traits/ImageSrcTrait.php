@@ -21,7 +21,7 @@ trait ImageSrcTrait
             }
         }
 
-        $image = (empty($this->image)) ? config('image.placeholder') : $this->image;
+        $image = (empty($this->image) || !file_exists(storage_path('app/public/' . $this->image))) ? config('image.placeholder') : $this->image;
 
         return SmartImage::cache($image, $sizes[0], $sizes[1]);
     }
