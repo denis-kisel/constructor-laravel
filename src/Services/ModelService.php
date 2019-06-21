@@ -9,6 +9,10 @@ class ModelService
     public static function create($modelClass, $stub, $replacer = null)
     {
         $modelPath = base_path(lcfirst(str_replace('\\', '/', $modelClass)) . '.php');
+
+        $basedir = pathinfo($modelPath, PATHINFO_DIRNAME);
+        is_dir($basedir) || `mkdir -p {$basedir}`;
+
         copy($stub, $modelPath);
 
         $basenameClass = class_basename($modelClass);

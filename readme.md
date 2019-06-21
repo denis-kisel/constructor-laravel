@@ -14,6 +14,82 @@ Via Composer
 $ composer require denis-kisel/constructor
 ```
 
+## Demo
+####  Create simple model with migration
+``` bash
+$ construct:model App\\Models\\Post --fields=name:string:50,description:text{nullable},sort:integer{default:0},is_active:boolean{default:1}
+```
+#####  Output
+* Created Post model: *proj/app/Models/Post.php*
+* Created Post model migration with contents:
+```php
+<?php
+
+...
+
+Schema::create('posts', function (Blueprint $table) {
+    $table->bigIncrements('id');
+    $table->string('name', 50);
+    $table->text('description')->nullable();
+    $table->integer('sort')->default(0);
+    $table->boolean('is_active')->default(1);
+    $table->timestamps();
+});
+
+...
+
+```
+####  Create simple model with migration and laravel-admin controller
+``` bash
+$ construct:model App\\Models\\Post --fields=name:string:50,description:text{nullable},sort:integer{default:0},is_active:boolean{default:1} --a
+```
+#####  Output
+* Created Post model: *proj/app/Models/Post.php*
+* Created Post model migration with contents(example above)
+* Created new resources route of laravel-admin: *admin/posts*
+* Created PostController of laravel-admin: *proj/app/Admin/Controllers/PostController.php* with contents:
+```php
+<?php
+
+...
+
+protected function grid()
+{
+    $grid = new Grid(new Post);
+
+    $grid->model()->orderBy('created_at', 'desc');
+
+    $grid->id(__('admin.id'));
+   
+    $grid->name(__('admin.name'))->editable('text');
+    $grid->sort(__('admin.sort'))->editable('text');
+    $grid->is_active(__('admin.is_active'))->editable('select', ActiveHelper::editable());
+    $grid->created_at(__('admin.created_at'));
+    $grid->updated_at(__('admin.updated_at'));
+
+    $grid->actions(function ($actions) {
+        $actions->disableView();
+    });
+
+    return $grid;
+}
+
+...
+
+protected function form()
+{
+    $form = new Form(new Post);
+    $form->text('name', __('admin.name'))->required();
+    $form->summernote('description', __('admin.description'));
+    $form->number('sort', __('admin.sort'))->default(0);
+    $form->switch('is_active', __('admin.is_active'))->default(1);
+    return $form;
+}
+
+...
+
+```
+
 ## Docs
 ### Available admin commands
 | Command | Description |
@@ -22,26 +98,31 @@ $ composer require denis-kisel/constructor
 | `construct:admint {model} {--fields=} {--i}` | Construct laravel-admin controller with bind to locale(translation) |
 | `construct:admin_page {model} {--fields=} {--i}` | Construct laravel-admin controller with basic page fields |
 
+
 ### Available install commands
 | Command | Description |
 | --- | --- |
-| `install:locale {--m} {--i} {--a}` | Install locale model with optional install controller for laravel-admin |
+| `install:locale {--m} {--i} {--a}` | Install locale model `App\Models\Locale` with optional install controller for laravel-admin with fields: `code`, `name`, `sort`, `is_active` |
 | `install:admin_locale` | Install locale controller for laravel-admin |
 | `install:construct_image` | Public image config and placeholder |
+
 
 ### Available model commands
 | Command | Description |
 | --- | --- |
 | `construct:model {model} {--fields=} {--i} {--m} {--a}` | Construct model |
 | `construct:modelt {model} {--fields=} {--i} {--m} {--a}` | Construct model with bind to locale(translation) |
-| `construct:page {model} {--fields=} {--a} {--i} {--m}` | Construct model with basic page fields |
+| `construct:page {model} {--fields=} {--a} {--i} {--m}` | Construct model with basic page fields: `code`, `slug`, `name`, `description`, `title`, `h1`, `keywords`, `meta_description`, `sort`, `is_active` |
 | `construct:paget {model} {--fields=} {--a} {--i} {--m}` | Construct model with basic page fields with bind to locale(translation) |
+| `construct:payment {--model=} {--a} {--i} {--m}` | Construct payment model. By default `App\Models\Payment`.Fields: `code`, `name`, `image`, `description`, `sort`, `is_active`|
+
 
 ### Options
 | Option | Description |
 | --- | --- |
 | `{model}` | Model name. Must be with *namespace* |
 | `{--fields=}` | Custom fields by pattern: *name:data_type:length{migration_methods}\[t\]*. Separate by `,` |
+| `{--pattern_path=}` | Path to file with custom fields by --fields pattern |
 | `{--i}` | Ignore exists model or controller |
 | `{--m}` | Make model and migration with `migrate` command |
 | `{--a}` | Construct laravel-admin controller |
