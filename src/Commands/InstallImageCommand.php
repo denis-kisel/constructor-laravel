@@ -16,8 +16,8 @@ class InstallImageCommand extends Command
     {
         file_exists(config_path('image.php')) || copy(__DIR__ . '/../../config/image.php', config_path('image.php'));
 
-        File::makeDirectory(storage_path('app/public'), '775', true, true);
+        File::makeDirectory(storage_path('app/public'), 0775, true, true);
         file_exists(storage_path('app/public/placeholder.png')) || copy(__DIR__ . '/../../resources/image/placeholder.png', storage_path('app/public/placeholder.png'));
-        chmod(storage_path('app/public/placeholder.png'), '775');
+        chmod(storage_path('app/public/placeholder.png'), 0775);
     }
 }
