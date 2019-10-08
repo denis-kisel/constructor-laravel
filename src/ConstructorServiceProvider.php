@@ -38,20 +38,6 @@ class ConstructorServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register any package services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-//        $this->mergeConfigFrom(__DIR__.'/../config/constructor.php', 'constructor');
-
-        // Register the service the package provides.
-        $this->app->singleton('constructor', function ($app) {
-            return new Constructor;
-        });
-    }
 
     /**
      * Get the services provided by the provider.
