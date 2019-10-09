@@ -37,8 +37,9 @@ class MigrationService
         foreach ($fields as $field) {
 
             if (!in_array($field['type'], $availableFieldTypes)) {
-                throw new MigrationException('Not available field - ' . $field['type'] . '. ' . __FILE__ . ':' .
-                    __LINE__);
+                $textFinder = new \SimilarText\Finder($field['type'], $availableFieldTypes);
+
+                throw new MigrationException("Not available field - {$field['type']}. Did you mean [{$textFinder->first()}]?");
             }
 
             $migrationMethods = self::makeMigrationMethods($field['migration_methods']);
