@@ -1,9 +1,8 @@
 # Constructor
 
-This is package for generate models and/or laravel-admin controllers by patterns
+This is package for generate migrations with models and/or [Laravel Admin](https://github.com/z-song/laravel-admin) controllers by patterns
 
 Package bind(but can use only for one of each):  
-* [Laravel](https://github.com/laravel/laravel)
 * [Laravel Admin](https://github.com/z-song/laravel-admin)
 * [Laravel Translatable](https://github.com/dimsav/laravel-translatable)
 ## Installation
@@ -14,19 +13,40 @@ Via Composer
 $ composer require denis-kisel/constructor
 ```
 
-## Demo
-####  Create simple model with migration
+## Usage
+###  Create Model With Empty Migration
+Command: `construct:model ModelName` 
+
+##### Example
+``` bash
+$ php artisan construct:model App\\Models\\Post 
+```
+#####  Output
+* Model: `App\Models\Post`
+* Migration: 
+
+```php
+Schema::create('posts', function (Blueprint $table) {
+    $table->bigIncrements('id');
+    $table->timestamps();
+});
+```
+###  Create Model With Fields
+Command: `construct:model ModelName [options]`  
+Option: `{--fields=}`  
+Field signature: `name:type:length{extraMethod:paramValue}`  
+Multi fields and extra methods must separate by comma `,`
+
+
+##### Example
 ``` bash
 $ php artisan construct:model App\\Models\\Post --fields=name:string:50,description:text{nullable},sort:integer{default:0},is_active:boolean{default:1}
 ```
 #####  Output
-* Created Post model: *proj/app/Models/Post.php*
-* Created Post model migration with contents:
+* Model: `App\Models\Post`
+* Migration:
+
 ```php
-<?php
-
-...
-
 Schema::create('posts', function (Blueprint $table) {
     $table->bigIncrements('id');
     $table->string('name', 50);
@@ -35,24 +55,90 @@ Schema::create('posts', function (Blueprint $table) {
     $table->boolean('is_active')->default(1);
     $table->timestamps();
 });
-
-...
-
 ```
-####  Create simple model with migration and laravel-admin controller
+
+### Create Model With Bind To Locale(Translation)
+Command: `construct:modelt ModelName [options]`  
+Option: `{--fields=}`  
+Field signature: `name:type:length{extraMethod:paramValue}[t]`
+Param `[t]` is optional and denotes `translation` field  
+Multi fields and extra methods must separate by comma `,`
+
+
+##### Example
 ``` bash
-$ php artisan construct:model App\\Models\\Post --fields=name:string:50,description:text{nullable},sort:integer{default:0},is_active:boolean{default:1} --a
+$ php artisan construct:modelt App\\Models\\Post --fields=name:string:50[t],description:text{nullable}[t],sort:integer{default:0},is_active:boolean{default:1}
 ```
 #####  Output
-* Created Post model: *proj/app/Models/Post.php*
-* Created Post model migration with contents(example above)
-* Created new resources route of laravel-admin: *admin/posts*
-* Created PostController of laravel-admin: *proj/app/Admin/Controllers/PostController.php* with contents:
+* Models: `App\Models\Post`, `App\Models\PostTranslation`
+* Migrations:
+
 ```php
-<?php
+// For Post
+Schema::create('posts', function (Blueprint $table) {
+    $table->bigIncrements('id');
+    $table->integer('sort')->default('0');
+    $table->boolean('is_active')->default('1');
+    $table->timestamps();
+});
 
-...
 
+// For PostTranslation
+Schema::create('post_translations', function (Blueprint $table) {
+    $table->bigIncrements('id');
+    $table->integer('post_id')->unsigned();
+    $table->string('locale')->index();
+    $table->string('name', 50);
+    $table->text('description')->nullable();
+    $table->unique(['post_id','locale']);
+    $table->timestamps();
+});
+```
+
+### Create Model With Basic Page Fields
+Command: `construct:page ModelName [options]`  
+
+##### Example
+``` bash
+$ php artisan construct:page App\\Models\\Post
+```
+#####  Output
+* Model: `App\Models\Post`
+* Migration:
+
+```php
+Schema::create('pages', function (Blueprint $table) {
+    $table->bigIncrements('id');
+    $table->string('code')->nullable();
+    $table->string('slug')->nullable();
+    $table->string('name');
+    $table->text('description')->nullable();
+    $table->string('title')->nullable();
+    $table->string('h1')->nullable();
+    $table->text('keywords')->nullable();
+    $table->text('meta_description')->nullable();
+    $table->integer('sort')->default('0');
+    $table->boolean('is_active')->default('1');
+    $table->timestamps();
+});
+```
+
+### Create Laravel-Admin Controller
+Command: `construct:admin ModelName {--fields=}`  
+Field signature: `name:type:length{extraMethod:paramValue}`  
+Multi fields and extra methods must separate by comma `,`
+
+
+##### Example
+``` bash
+$ php artisan construct:admin App\\Models\\Post --fields=name:string:50,description:text{nullable},sort:integer{default:0},is_active:boolean{default:1}
+```
+#####  Output
+* Admin Controller: `App\Admin\Controllers\PostController`
+* Contains:
+
+```php
+// Grid
 protected function grid()
 {
     $grid = new Grid(new Post);
@@ -60,10 +146,11 @@ protected function grid()
     $grid->model()->orderBy('created_at', 'desc');
 
     $grid->id(__('admin.id'));
-   
-    $grid->name(__('admin.name'))->editable('text');
-    $grid->sort(__('admin.sort'))->editable('text');
-    $grid->is_active(__('admin.is_active'))->editable('select', ActiveHelper::editable());
+    $grid->name( __('admin.name'))->editable('text');
+    $grid->description( __('admin.description'))->editable('text');
+    $grid->sort( __('admin.sort'))->editable('text');
+    $grid->is_active( __('admin.is_active'))->editable('select', ActiveHelper::editable());
+
     $grid->created_at(__('admin.created_at'));
     $grid->updated_at(__('admin.updated_at'));
 
@@ -74,180 +161,101 @@ protected function grid()
     return $grid;
 }
 
-...
-
+// Form
 protected function form()
 {
     $form = new Form(new Post);
+
     $form->text('name', __('admin.name'))->required();
     $form->summernote('description', __('admin.description'));
-    $form->number('sort', __('admin.sort'))->default(0);
-    $form->switch('is_active', __('admin.is_active'))->default(1);
+    $form->number('sort', __('admin.sort'))->default('0')->required();
+    $form->switch('is_active', __('admin.is_active'))->default('1')->required();
+
     return $form;
 }
-
-...
-
 ```
 
-## Docs
-### Available admin commands
-| Command | Description |
-| --- | --- |
-| `construct:admin {model} {--fields=} {--i}` | Construct laravel-admin controller |
-| `construct:admint {model} {--fields=} {--i}` | Construct laravel-admin controller with bind to locale(translation) |
-| `construct:admin_page {model} {--fields=} {--i}` | Construct laravel-admin controller with basic page fields |
+## Options
+### Create Model With Fields
+Command: `construct:modelt ModelName {--fields=}`  
+Field signature: `name:type:length{extraMethod:paramValue}[t]`
+Param `[t]` is optional and denotes `translation` field  
+Multi fields and extra methods must separate by comma `,`
 
-
-### Available install commands
-| Command | Description |
-| --- | --- |
-| `install:locale {--m} {--i} {--a}` | Install locale model `App\Models\Locale` with optional install controller for laravel-admin with fields: `code`, `name`, `sort`, `is_active` |
-| `install:admin_locale` | Install locale controller for laravel-admin |
-| `install:construct_image` | Public image config and placeholder |
-
-
-### Available model commands
-| Command | Description |
-| --- | --- |
-| `construct:model {model} {--fields=} {--i} {--m} {--a}` | Construct model |
-| `construct:modelt {model} {--fields=} {--i} {--m} {--a}` | Construct model with bind to locale(translation) |
-| `construct:page {model} {--fields=} {--a} {--i} {--m}` | Construct model with basic page fields: `code`, `slug`, `name`, `description`, `title`, `h1`, `keywords`, `meta_description`, `sort`, `is_active` |
-| `construct:paget {model} {--fields=} {--a} {--i} {--m}` | Construct model with basic page fields with bind to locale(translation) |
-| `construct:payment {--model=} {--a} {--i} {--m}` | Construct payment model. By default `App\Models\Payment`.Fields: `code`, `name`, `image`, `description`, `sort`, `is_active`|
-
-
-### Options
-| Option | Description |
-| --- | --- |
-| `{model}` | Model name. Must be with *namespace* |
-| `{--fields=}` | Custom fields by pattern: *name:data_type:length{migration_methods}\[t\]*. Separate by `,` |
-| `{--pattern_path=}` | Path to file with custom fields by --fields pattern |
-| `{--i}` | Ignore exists model or controller |
-| `{--m}` | Make model and migration with `migrate` command |
-| `{--a}` | Construct laravel-admin controller |
-
-
-### Fields pattern
-*name:data_type:length{migration_methods}\[t\]*
-
-| Option | Description |
-| --- | --- |
-| `name` | Column name |
-| `data_type` | Data type of DB(`string`, `text`, `json` ... ) |
-| `length` | Column field length. Optional param |
-| `{migration_methods}` | Migration methods by pattern *{method_name:method_param}*. Separate by `+`. Optional param |
-| `[t]` | Mark field as translation(for bind to locale). Optional param |
-
-
-### Migration methods pattern
-*{method_name:method_param}*
-
-| Option | Description |
-| --- | --- |
-| `method_name` | Method name. Exp: nullable -> nullable() |
-| `method_param` | Method value. Exp: default:1 -> default(1) |
-
-## Usage
-
-Create new model
+##### Example
 ``` bash
-# Command: construct:model {model} {--fields=} {--m} {--a} {--i}
-
-# {model} - must be with namespace(exp: App\\Models\\Page)
-$ php artisan construct:model App\\Models\\Page
-
-
-# {--fields} - custom fields by pattern: name:data_type:length{migration_methods}
-# Where 'name' is field name of DB table, 'data_type' is type by migration methods(string|text|boolean .. eth)
-# 'length' is optional param
-$ php artisan construct:model App\\Models\\Page --fields=name:string:50
-
-# Add more fields:
-$ php artisan construct:model App\\Models\\Page --fields=name:string:50,description:text,sort:number
-
-
-# {migration_methods} - additional migration methods. Optional param.
-# {migration_methods} pattern: {method_name:method_param}. method_param is optional param
-$ php artisan construct:model App\\Models\\Page --fields=name:string{nullable}
-
-# Add more migration methods:
-$ php artisan construct:model App\\Models\\Page --fields=name:string{nullable+default:0}
-
-
-# {--m} - call migrate after create new model
-$ php artisan construct:model App\\Models\\Page --fields=name:string:50 --m
-
-
-# {--a} - call construct:admin by model. Generate admin controller.
-$ php artisan construct:model App\\Models\\Page --fields=name:string:50 --a
-
-
-# {--i} - ignore exists model. You can overwrite your model.
-$ php artisan construct:model App\\Models\\Page --fields=name:string:50 --i
-
+$ php artisan construct:model App\\Models\\Post --fields=name:string:50[t],description:text{nullable}[t],sort:integer{default:0},is_active:boolean{default:1}
 ```
 
-Create new model with translation(bind with locale)
+### Create Model And Run Migration
+Option: `{--m}` *(migration)*  
+
+##### Example
 ``` bash
-# Install locale table
-$ php artisan install:locale --m
-
-# Install locale table with admin controller
-$ php artisan install:locale --a
-
-# Command: construct:modelt {model} {--fields=} {--i} {--m} {--a}
-$ php artisan construct:modelt App\\Models\\Page
-
-# {--fields} - custom fields by pattern: name:data_type:length{migration_methods}[t]
-# [t] - mark field as translation for bind locale. Optional param.
-$ php artisan construct:modelt App\\Models\\Page --fields=name:string:50[t],description:text[t],sort:number
+$ php artisan construct:model App\\Models\\Post --fields=name:string:50 --m
 ```
 
-Create new model with basic set fields for typical page
+### Overwrite Exists Model Or/And Controller
+Option: `{--i}` *(ignore)*  
+
+##### Example
 ``` bash
-# Command: construct:page {model} {--fields=} {--a} {--i} {--m}
-$ php artisan construct:page App\\Models\\Page
-
-# Migration file:
-<?php
-...
-    $table->bigIncrements('id');
-    $table->string('code')->nullable();
-    $table->string('name');
-    $table->text('description')->nullable();
-    $table->string('title')->nullable();
-    $table->string('h1')->nullable();
-    $table->text('keywords')->nullable();
-    $table->text('meta_description')->nullable();
-    $table->integer('sort')->default('0');
-    $table->boolean('is_active')->default('1');
-    $table->timestamps();
-...
-?>
-
-
-$ php artisan construct:page App\\Models\\Page --fields=additional_description:text{nullable}
-
-# Migration file:
-<?php
-...
-    $table->bigIncrements('id');
-    $table->string('code')->nullable();
-    $table->string('name');
-    $table->text('description')->nullable();
-    $table->string('title')->nullable();
-    $table->string('h1')->nullable();
-    $table->text('keywords')->nullable();
-    $table->text('meta_description')->nullable();
-    $table->text('additional_description')->nullable();
-    $table->integer('sort')->default('0');
-    $table->boolean('is_active')->default('1');
-    $table->timestamps();
-...
-?>
-
-
-# Also available generate typical translation page
-$ php artisan construct:paget App\\Models\\Page --fields=additional_description:text{nullable}[t]
+$ php artisan construct:model App\\Models\\Post --fields=name:string:50 --i
 ```
+
+
+### Create Model With Laravel-Admin Controller
+Option: `{--a}` *(admin)*  
+
+##### Example
+``` bash
+$ php artisan construct:model App\\Models\\Post --fields=name:string:50 --a
+```
+
+
+## Commands
+### Create Model
+Command: `construct:model [options]`
+
+### Create Translatable Model(Bind With Locale)
+Command: `construct:modelt [options]`
+
+### Create Model With Basics Page Fields
+Command: `construct:page [options]`
+Basic Fields: `id`, `code`, `slug`, `name`, `description`, `title`, `h1`, `keywords`, `meta_description`, `sort`, `is_active`, `timestamps`
+
+### Create Model With Basics Page Fields(Bind With Locale)
+Command: `construct:paget [options]`
+Basic Fields Page: `id`, `sort`, `is_active`, `timestamps`
+Basic Fields PageTranslation: `code`, `slug`, `name`, `description`, `title`, `h1`, `keywords`, `meta_description`
+
+### Create Model With Basics Page Fields
+Command: `construct:page [options]`
+Basic Fields: `id`, `code`, `slug`, `name`, `description`, `title`, `h1`, `keywords`, `meta_description`, `sort`, `is_active`, `timestamps`
+
+### Create Laravel Admin Controller
+Command: `construct:admin [options]`
+
+### Create Translatable Laravel Admin Controller(Bind With Locale)
+Command: `construct:admint [options]`
+
+### Create Laravel Admin Controller With Basics Page Fields
+Command: `construct:admin_page [options]`
+Basic Fields: See `construct:page`
+
+### Create Locale Model With Laravel Admin Controller
+Command: `install:locale [options]`
+
+##### Example
+```bash
+$ php artisan install:locale --a --m
+```
+
+## License
+This package is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT)
+
+## Contact
+Developer: Denis Kisel
+* Email: denis.kisel92@gmail.com
+* Skype: live:denis.kisel92
+

@@ -1,6 +1,7 @@
 {
     "name": "denis-kisel/constructor",
     "description": ":Ready solution for generate models with laravel-admin controllers",
+    "license": "MIT",
     "authors": [
         {
             "name": "Denis Kisel",
