@@ -176,8 +176,17 @@ protected function form()
 ```
 
 ## Options
+
+| Option | Description |
+| --- | --- |
+| `{--fields=}` | Create model with fields | 
+| `{--pattern_path=}` | Path to file with custom fields by pattern |
+| `{--i}` | Ignore exists model or controller |
+| `{--m}` | Run migration |
+| `{--a}` | Create model with laravel-admin controller |
+
 ### Create Model With Fields
-Command: `construct:modelt ModelName {--fields=}`  
+Option: `{--fields=}`  
 Field signature: `name:type:length{extraMethod:paramValue}[t]`
 Param `[t]` is optional and denotes `translation` field  
 Multi fields and extra methods must separate by comma `,`
@@ -187,7 +196,7 @@ Multi fields and extra methods must separate by comma `,`
 $ php artisan construct:model App\\Models\\Post --fields=name:string:50[t],description:text{nullable}[t],sort:integer{default:0},is_active:boolean{default:1}
 ```
 
-### Create Model And Run Migration
+### Run Migration
 Option: `{--m}` *(migration)*  
 
 ##### Example
@@ -212,44 +221,17 @@ Option: `{--a}` *(admin)*
 $ php artisan construct:model App\\Models\\Post --fields=name:string:50 --a
 ```
 
-
 ## Commands
-### Create Model
-Command: `construct:model [options]`
-
-### Create Translatable Model(Bind With Locale)
-Command: `construct:modelt [options]`
-
-### Create Model With Basics Page Fields
-Command: `construct:page [options]`
-Basic Fields: `id`, `code`, `slug`, `name`, `description`, `title`, `h1`, `keywords`, `meta_description`, `sort`, `is_active`, `timestamps`
-
-### Create Model With Basics Page Fields(Bind With Locale)
-Command: `construct:paget [options]`
-Basic Fields Page: `id`, `sort`, `is_active`, `timestamps`
-Basic Fields PageTranslation: `code`, `slug`, `name`, `description`, `title`, `h1`, `keywords`, `meta_description`
-
-### Create Model With Basics Page Fields
-Command: `construct:page [options]`
-Basic Fields: `id`, `code`, `slug`, `name`, `description`, `title`, `h1`, `keywords`, `meta_description`, `sort`, `is_active`, `timestamps`
-
-### Create Laravel Admin Controller
-Command: `construct:admin [options]`
-
-### Create Translatable Laravel Admin Controller(Bind With Locale)
-Command: `construct:admint [options]`
-
-### Create Laravel Admin Controller With Basics Page Fields
-Command: `construct:admin_page [options]`
-Basic Fields: See `construct:page`
-
-### Create Locale Model With Laravel Admin Controller
-Command: `install:locale [options]`
-
-##### Example
-```bash
-$ php artisan install:locale --a --m
-```
+| Command | Description |
+| --- | --- |
+| `construct:model [options]` | Create Model |
+| `construct:modelt [options]` | Create Translatable Model (Bind With Locale) |
+| `construct:page [options]` | Create Model With Basics Page Fields: `id`, `code`, `slug`, `name`, `description`, `title`, `h1`, `keywords`, `meta_description`, `sort`, `is_active`, `timestamps` |
+| `construct:paget [options]` | Create Model With Basics Page Fields(Bind With Locale). Page Fields: `id`, `sort`, `is_active`, `timestamps`. PageTranslation Fields: `code`, `slug`, `name`, `description`, `title`, `h1`, `keywords`, `meta_description` |
+| `construct:admin [options]` | Create Laravel Admin Controller |
+| `construct:admint [options]` | Create Translatable Laravel Admin Controller(Bind With Locale) |
+| `construct:admin_page [options]` | Create Laravel Admin Controller With Basics Page Fields. Basic Fields: See `construct:page` |
+| `install:locale [options]` | Create Locale Model With Laravel Admin Controller. Example: `$ php artisan install:locale --a --m` |
 
 ## License
 This package is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT)
