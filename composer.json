@@ -13,11 +13,10 @@
     "keywords": ["Laravel", "Constructor"],
     "require": {
         "illuminate/support": ">=5.4",
-        "denis-kisel/active-helper" : "*",
-        "denis-kisel/smart-image" : "*",
-        "denis-kisel/helper": "*",
-        "dimsav/laravel-translatable": "*",
-        "rap2hpoutre/similar-text-finder": "*"
+        "denis-kisel/active-helper" : "~1",
+        "denis-kisel/smart-image" : "~1",
+        "denis-kisel/helper": "~1",
+        "rap2hpoutre/similar-text-finder": "^1.1"
     },
     "autoload": {
         "psr-4": {

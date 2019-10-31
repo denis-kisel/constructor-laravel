@@ -2,9 +2,10 @@
 
 This is package for generate migrations with models and/or [Laravel Admin](https://github.com/z-song/laravel-admin) controllers by patterns
 
-Package bind(but can use only for one of each):  
-* [Laravel Admin](https://github.com/z-song/laravel-admin)
-* [Laravel Translatable](https://github.com/dimsav/laravel-translatable)
+## Dependence
+* For use [Laravel Admin](https://github.com/z-song/laravel-admin) controllers need to install this package  
+* For use [Laravel Translatable](https://github.com/dimsav/laravel-translatable) need to install this package
+
 ## Installation
 
 Via Composer
@@ -58,6 +59,7 @@ Schema::create('posts', function (Blueprint $table) {
 ```
 
 ### Create Model With Bind To Locale(Translation)
+[Doc](https://github.com/dimsav/laravel-translatable)  
 Command: `construct:modelt ModelName [options]`  
 Option: `{--fields=}`  
 Field signature: `name:type:length{extraMethod:paramValue}[t]`
@@ -124,6 +126,7 @@ Schema::create('pages', function (Blueprint $table) {
 ```
 
 ### Create Laravel-Admin Controller
+[Doc](https://laravel-admin.org/docs)  
 Command: `construct:admin ModelName {--fields=}`  
 Field signature: `name:type:length{extraMethod:paramValue}`  
 Multi fields and extra methods must separate by comma `,`
