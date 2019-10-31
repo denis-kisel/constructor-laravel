@@ -59,7 +59,7 @@ Schema::create('posts', function (Blueprint $table) {
 ```
 
 ### Create Model With Bind To Locale(Translation)
-[Doc](https://github.com/dimsav/laravel-translatable)  
+See Translatable [Doc](https://github.com/dimsav/laravel-translatable)  
 Command: `construct:modelt ModelName [options]`  
 Option: `{--fields=}`  
 Field signature: `name:type:length{extraMethod:paramValue}[t]`
@@ -126,7 +126,7 @@ Schema::create('pages', function (Blueprint $table) {
 ```
 
 ### Create Laravel-Admin Controller
-[Doc](https://laravel-admin.org/docs)  
+See Laravel-Admin [Doc](https://laravel-admin.org/docs)  
 Command: `construct:admin ModelName {--fields=}`  
 Field signature: `name:type:length{extraMethod:paramValue}`  
 Multi fields and extra methods must separate by comma `,`
