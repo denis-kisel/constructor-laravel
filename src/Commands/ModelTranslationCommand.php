@@ -101,10 +101,18 @@ class ModelTranslationCommand extends Command
         if ($this->option('mig_replacer')) {
             return $this->option('mig_replacer');
         }
-        return json_encode([
-            '{belongTableId}',
-            Str::snake($this->baseNameModelClass()) . '_id'
-        ]);
+        return json_encode(
+            [
+                [
+                    '{belongTableFieldId}',
+                    Str::snake($this->baseNameModelClass()) . '_id'
+                ],
+                [
+                    '{belongTableName}',
+                    Str::plural(Str::snake($this->baseNameModelClass()))
+                ]
+            ]
+        );
     }
 
     protected function modelReplacer()

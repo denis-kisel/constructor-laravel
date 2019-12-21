@@ -23,7 +23,9 @@ class MigrationService
         $content = str_replace('{fields}', $generatedFields, $content);
 
         if ($replacer) {
-            $content = str_replace($replacer[0], $replacer[1], $content);
+            foreach ($replacer as $item) {
+                $content = str_replace($item[0], $item[1], $content);
+            }
         }
 
         file_put_contents($migrationPath, $content);
