@@ -45,7 +45,7 @@ trait NestedCategoryTrait
             $this->pathByParent = collect([]);
         }
         if (!is_null($categoryId)) {
-            $category = Category::find($categoryId);
+            $category = Category::with('translations')->whereId($categoryId)->whereTranslation('locale', config('app.locale'))->first();
             $this->pathByParent->push($category);
             if (!is_null($category->parent_id)) {
                 $this->path($category->parent_id);
@@ -53,5 +53,34 @@ trait NestedCategoryTrait
         }
 
         return $this->pathByParent->reverse();
+    }
+
+    public static function tree($parentId = null)
+    {
+        $categories = Category::with('translations');
+
+        if (is_null($parentId)) {
+            $categories->whereNull('parent_id');
+        } else {
+            $categories->whereParentId($parentId);
+        }
+
+        $categoryItems = $categories->whereTranslation('locale', config('app.locale'))->get();
+
+        $tree = [];
+        if ($categoryItems->count() > 0) {
+            foreach ($categoryItems as $category) {
+                if ($category->is_active) {
+                    $tree[] = [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                        'href' => $category->href(),
+                        'children' => self::tree($category->id)
+                    ];
+                }
+            }
+        }
+
+        return $tree;
     }
 }

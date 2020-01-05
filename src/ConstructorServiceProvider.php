@@ -16,6 +16,7 @@ use DenisKisel\Constructor\Commands\ModelTranslationCommand;
 use DenisKisel\Constructor\Commands\PageCommand;
 use DenisKisel\Constructor\Commands\PageTranslationCommand;
 use DenisKisel\Constructor\Commands\PaymentCommand;
+use DenisKisel\Constructor\Commands\UpdateCategoryPathCommand;
 use Illuminate\Support\ServiceProvider;
 
 class ConstructorServiceProvider extends ServiceProvider
@@ -48,7 +49,7 @@ class ConstructorServiceProvider extends ServiceProvider
     {
         return ['constructor'];
     }
-    
+
     /**
      * Console-specific booting.
      *
@@ -96,6 +97,7 @@ class ConstructorServiceProvider extends ServiceProvider
              InstallAdminLocaleCommand::class,
              InstallImageCommand::class,
              PaymentCommand::class,
+             UpdateCategoryPathCommand::class
          ]);
     }
 }
