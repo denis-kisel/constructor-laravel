@@ -55,7 +55,7 @@ trait NestedCategoryTrait
         return $this->pathByParent->reverse();
     }
 
-    public static function tree($parentId = null)
+    public static function arrayTree($parentId = null)
     {
         $categories = Category::with('translations');
 
@@ -75,7 +75,7 @@ trait NestedCategoryTrait
                         'id' => $category->id,
                         'name' => $category->name,
                         'href' => $category->href(),
-                        'children' => self::tree($category->id)
+                        'children' => self::arrayTree($category->id)
                     ];
                 }
             }
