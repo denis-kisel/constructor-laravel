@@ -4,6 +4,7 @@
 namespace DenisKisel\Constructor\Traits;
 
 
+use App\Models\Category;
 use App\Models\CategoryPath;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -42,9 +43,13 @@ trait CategoryPathTrait
         }
     }
 
-    /** @return Array */
     public function nestedCategoryIds()
     {
         return CategoryPath::wherePathId($this->id)->pluck('category_id')->toArray();
+    }
+
+    public function categoriesAsPath()
+    {
+        return Category::whereIn('id', $this->nestedCategoryIds())->get();
     }
 }

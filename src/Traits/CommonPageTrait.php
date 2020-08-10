@@ -3,6 +3,8 @@
 
 namespace DenisKisel\Constructor\Traits;
 
+use Illuminate\Support\Str;
+
 trait CommonPageTrait
 {
     use HrefTrait;

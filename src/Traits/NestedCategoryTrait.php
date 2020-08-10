@@ -66,9 +66,8 @@ trait NestedCategoryTrait
         }
 
         $categoryItems = $categories->whereTranslation('locale', config('app.locale'))->get();
-
         $tree = [];
-        if ($categoryItems->count() > 0) {
+        if ($categoryItems->isNotEmpty()) {
             foreach ($categoryItems as $category) {
                 if ($category->is_active) {
                     $tree[] = [
