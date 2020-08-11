@@ -65,7 +65,7 @@ trait NestedCategoryTrait
             $categories->whereParentId($parentId);
         }
 
-        $categoryItems = $categories->whereTranslation('locale', config('app.locale'))->get();
+        $categoryItems = $categories->whereTranslation('locale', config('app.locale'))->orderBy('sort')->get();
         $tree = [];
         if ($categoryItems->isNotEmpty()) {
             foreach ($categoryItems as $category) {
