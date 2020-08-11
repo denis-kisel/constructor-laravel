@@ -47,7 +47,7 @@ trait NestedCategoryTrait
         if (!is_null($categoryId)) {
             $category = Category::with('translations')->whereId($categoryId)->whereTranslation('locale', config('app.locale'))->first();
             $this->pathByParent->push($category);
-            if (!is_null($category->parent_id)) {
+            if (!empty($category->parent_id)) {
                 $this->path($category->parent_id);
             }
         }
