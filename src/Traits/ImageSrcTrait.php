@@ -11,6 +11,6 @@ trait ImageSrcTrait
     {
         $image = (empty($this->{$imageField}) || !file_exists(storage_path('app/public/' . $this->{$imageField}))) ? config('image.placeholder') : $this->{$imageField};
 
-        return SmartImage::cache($image, $with, $height);
+        return SmartImage::cache($image, (int)$with, (int)$height);
     }
 }
