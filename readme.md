@@ -170,7 +170,7 @@ protected function form()
     $form = new Form(new Post);
 
     $form->text('name', __('admin.name'))->required();
-    $form->summernote('description', __('admin.description'));
+    $form->ckeditor('description', __('admin.description'));
     $form->number('sort', __('admin.sort'))->default('0')->required();
     $form->switch('is_active', __('admin.is_active'))->default('1')->required();
 

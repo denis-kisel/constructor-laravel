@@ -19,4 +19,24 @@ trait CommonPageTrait
     {
         return (!empty($this->h1)) ? $this->h1 : $this->name;
     }
+
+    public function getMetaDescription()
+    {
+        return $this->meta_description;
+    }
+
+    public function getMetaKeywords()
+    {
+        return $this->meta_keywords;
+    }
+
+    public function canonical()
+    {
+        return $this->href();
+    }
+
+    public function isAllowedIndex()
+    {
+        return $this->allow_index ?? 0;
+    }
 }

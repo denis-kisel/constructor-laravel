@@ -154,7 +154,7 @@ class {model}Controller extends Controller
             'id'));
             $form->text('name', __('admin.name'))->required();
             $form->text('price', __('admin.price'));
-            $form->summernote('description', __('admin.description'));
+            $form->ckeditor('description', __('admin.description'));
             $form->number('sort')->default(0);
             $form->switch('is_active', __('admin.is_active'))->default(1);
         })->tab(__('admin.images'), function (Form $form) {

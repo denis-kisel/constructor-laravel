@@ -152,7 +152,7 @@ class {model}Controller extends Controller
         $form->text('name', __('admin.name'))->required();
         $form->image('image', __('admin.image'));
         $form->textarea('short_description', __('admin.short_description'));
-        $form->summernote('description', __('admin.description'));
+        $form->ckeditor('description', __('admin.description'));
         $form->text('title', __('admin.title'));
         $form->text('slug', __('admin.slug'))->required();
         $form->text('h1', __('admin.h1'))->attribute(['style' => 'margin:0']);
